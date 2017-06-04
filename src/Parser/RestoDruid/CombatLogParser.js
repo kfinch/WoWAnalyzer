@@ -319,7 +319,7 @@ class CombatLogParser extends MainCombatLogParser {
         value={`${formatPercentage(efflorescenceUptime)} %`}
         label='Efflorescence uptime'
       />,
-      this.modules.dreamwalker.hasTalent && (
+      this.modules.dreamwalker.hasTrait && (
       <StatisticBox icon={<SpellIcon id={SPELLS.DREAMWALKER.id}/>}
         value={`${formatNumber(this.modules.dreamwalker.healing)}`}
                     label={(
@@ -328,7 +328,7 @@ class CombatLogParser extends MainCombatLogParser {
                       </dfn>
                     )}
       />),
-      this.modules.powerOfTheArchdruid.hasTalent && (
+      this.modules.powerOfTheArchdruid.hasTrait && (
         <StatisticBox
           icon={<SpellIcon id={SPELLS.POWER_OF_THE_ARCHDRUID.id} />}
           value={`${formatPercentage(potaHealing)} %`}
