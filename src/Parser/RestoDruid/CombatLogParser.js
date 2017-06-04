@@ -45,6 +45,7 @@ import Innervate from './Modules/Features/Innervate';
 import PowerOfTheArchdruid from './Modules/Features/PowerOfTheArchdruid';
 import Dreamwalker from './Modules/Features/Dreamwalker';
 import SoulOfTheForest from './Modules/Features/SoulOfTheForest';
+import SpringBlossom from './Modules/Features/SpringBlossom';
 
 import CPM_ABILITIES, { SPELL_CATEGORY } from './CPM_ABILITIES';
 
@@ -90,6 +91,7 @@ class CombatLogParser extends MainCombatLogParser {
     powerOfTheArchdruid: PowerOfTheArchdruid,
     dreamwalker: Dreamwalker,
     soulOfTheForest: SoulOfTheForest,
+    springBlossom: SpringBlossom,
 
     // Legendaries:
     drapeOfShame: DrapeOfShame,
@@ -145,6 +147,8 @@ class CombatLogParser extends MainCombatLogParser {
     const fightDuration = this.fightDuration;
     const nonHealingTimePercentage = this.modules.alwaysBeCasting.totalHealingTimeWasted / fightDuration;
     const deadTimePercentage = this.modules.alwaysBeCasting.totalTimeWasted / fightDuration;
+
+    const springBlossomsHealing = this.modules.springBlossom.healing + this.modules.springBlossom.masteryHealing;
 
     const potaHealing = (this.modules.powerOfTheArchdruid.rejuvenations * oneRejuvenationThroughput) + this.modules.powerOfTheArchdruid.healing / this.totalHealing;
     const hasMoC = this.selectedCombatant.lv100Talent === SPELLS.MOMENT_OF_CLARITY_TALENT.id;
@@ -315,7 +319,7 @@ class CombatLogParser extends MainCombatLogParser {
         value={`${formatPercentage(efflorescenceUptime)} %`}
         label='Efflorescence uptime'
       />,
-      this.modules.dreamwalker.hasTrait && (
+      this.modules.dreamwalker.hasTalent && (
       <StatisticBox icon={<SpellIcon id={SPELLS.DREAMWALKER.id}/>}
         value={`${formatNumber(this.modules.dreamwalker.healing)}`}
                     label={(
@@ -324,13 +328,83 @@ class CombatLogParser extends MainCombatLogParser {
                       </dfn>
                     )}
       />),
-      this.modules.powerOfTheArchdruid.hasTrait && (
+      this.modules.powerOfTheArchdruid.hasTalent && (
         <StatisticBox
           icon={<SpellIcon id={SPELLS.POWER_OF_THE_ARCHDRUID.id} />}
           value={`${formatPercentage(potaHealing)} %`}
           label={(
             <dfn data-tip={`Power of the archdruid gave you ${this.modules.powerOfTheArchdruid.rejuvenations} bonus rejuvenations, ${this.modules.powerOfTheArchdruid.regrowths} bonus regrowths`}>
               Power of the archdruid
+            </dfn>
+          )}
+        />
+      ),
+      hasTreeOfLife && (
+        <StatisticBox
+          icon={<SpellIcon id={SPELLS.INCARNATION_TREE_OF_LIFE_TALENT.id} />}
+          value={`${formatPercentage(treeOfLifeThroughput)} %`}
+          label={(
+            <dfn data-tip={`
+              <ul>
+                <li>${(rejuvenationIncreasedEffect*100).toFixed(2)}% from increased rejuvenation effect</li>
+                <li>${(rejuvenationMana*100).toFixed(2)}% from reduced rejuvenation cost</li>
+                <li>${(wildGrowthIncreasedEffect*100).toFixed(2)}% from increased wildgrowth effect</li>
+                <li>${(tolIncreasedHealingDone*100).toFixed(2)}% from overall increased healing effect</li>
+                <li>${(treeOfLifeUptime*100).toFixed(2)}% uptime</li>
+              </ul>
+            `}>
+              Tree of Life throughput
+            </dfn>
+          )}
+        />
+      ),
+      hasSoulOfTheForest && (
+        <StatisticBox
+          icon={<SpellIcon id={SPELLS.SOUL_OF_THE_FOREST_TALENT.id} />}
+          value={`${((soulOfTheForestHealing/this.totalHealing)*100).toFixed(2)} %`}
+          label={(
+            <dfn data-tip={`
+              <ul>
+                <li>You had total ${this.modules.soulOfTheForest.proccs} Soul of the Forest proccs.</li>
+                <li>Wild Growth consumed ${this.modules.soulOfTheForest.wildGrowths} procc(s) and contributed to ${((this.modules.soulOfTheForest.wildGrowthHealing/this.totalHealing)*100).toFixed(2)} % / ${formatNumber(this.modules.soulOfTheForest.wildGrowthHealing)} healing</li>
+                <li>Rejuvenation consumed ${this.modules.soulOfTheForest.rejuvenations} procc(s) and contributed to ${((this.modules.soulOfTheForest.rejuvenationHealing/this.totalHealing)*100).toFixed(2)} % / ${formatNumber(this.modules.soulOfTheForest.rejuvenationHealing)} healing</li>
+                <li>Regrowth consumed ${this.modules.soulOfTheForest.regrowths} procc(s) and contributed to ${((this.modules.soulOfTheForest.regrowthHealing/this.totalHealing)*100).toFixed(2)} % / ${formatNumber(this.modules.soulOfTheForest.regrowthHealing)} healing</li>
+              </ul>
+            `}>
+              Soul of the Forest analyzer
+            </dfn>
+          )}
+        />
+      ),
+      !hasMoC && (
+        <StatisticBox
+          icon={<SpellIcon id={SPELLS.CLEARCASTING_BUFF.id} />}
+          value={`${formatPercentage(unusedClearcastings)} %`}
+          label={(
+            <dfn data-tip={`You got total <b>${this.modules.clearcasting.total} clearcasting proccs</b> and <b>used ${this.modules.clearcasting.used}</b> of them. <b>${this.modules.clearcasting.nonCCRegrowths} of your regrowths was used without a clearcasting procc</b>. Using a clearcasting procc as soon as you get it should be one of your top priorities. Even if it overheals you still get that extra mastery stack on a target and the minor HoT. Spending your GCD on a free spell also helps you with mana management in the long run.`}>
+              Unused Clearcastings
+            </dfn>
+          )}
+        />
+      ),
+      this.modules.springBlossom.hasTalent && (
+        <StatisticBox
+          icon={<SpellIcon id={SPELLS.SPRING_BLOSSOMS.id} />}
+          value={`${formatPercentage(springBlossomsHealing/this.totalHealing)} %`}
+          label={(
+            <dfn data-tip={`${formatPercentage(this.modules.springBlossom.healing/this.totalHealing)} % came from healing and ${formatPercentage(this.modules.springBlossom.masteryHealing/this.totalHealing)} % came from mastery`}>
+              Spring blossoms healing
+            </dfn>
+          )}
+        />
+      ),
+      (
+        <StatisticBox
+          icon={<Icon icon="petbattle_health-down" alt="Non healing time" />}
+          value={`${formatPercentage(nonHealingTimePercentage)} %`}
+          label={(
+            <dfn data-tip={`Non healing time is available casting time not used for a spell that helps you heal. This can be caused by latency, cast interrupting, not casting anything (e.g. due to movement/stunned), DPSing, etc.<br /><br />You spent ${formatPercentage(deadTimePercentage)}% of your time casting nothing at all.`}>
+              Non healing time
             </dfn>
           )}
         />
@@ -417,65 +491,6 @@ class CombatLogParser extends MainCombatLogParser {
           </dfn>
         )}
       />,
-      hasTreeOfLife && (
-        <StatisticBox
-          icon={<SpellIcon id={SPELLS.INCARNATION_TREE_OF_LIFE_TALENT.id} />}
-          value={`${formatPercentage(treeOfLifeThroughput)} %`}
-          label={(
-            <dfn data-tip={`
-              <ul>
-                <li>${(rejuvenationIncreasedEffect*100).toFixed(2)}% from increased rejuvenation effect</li>
-                <li>${(rejuvenationMana*100).toFixed(2)}% from reduced rejuvenation cost</li>
-                <li>${(wildGrowthIncreasedEffect*100).toFixed(2)}% from increased wildgrowth effect</li>
-                <li>${(tolIncreasedHealingDone*100).toFixed(2)}% from overall increased healing effect</li>
-                <li>${(treeOfLifeUptime*100).toFixed(2)}% uptime</li>
-              </ul>
-            `}>
-              Tree of Life throughput
-            </dfn>
-          )}
-        />
-      ),
-      hasSoulOfTheForest && (
-        <StatisticBox
-          icon={<SpellIcon id={SPELLS.SOUL_OF_THE_FOREST_TALENT.id} />}
-          value={`${((soulOfTheForestHealing/this.totalHealing)*100).toFixed(2)} %`}
-          label={(
-            <dfn data-tip={`
-              <ul>
-                <li>You had total ${this.modules.soulOfTheForest.proccs} Soul of the Forest proccs.</li>
-                <li>Wild Growth consumed ${this.modules.soulOfTheForest.wildGrowths} procc(s) and contributed to ${((this.modules.soulOfTheForest.wildGrowthHealing/this.totalHealing)*100).toFixed(2)} % / ${formatNumber(this.modules.soulOfTheForest.wildGrowthHealing)} healing</li>
-                <li>Rejuvenation consumed ${this.modules.soulOfTheForest.rejuvenations} procc(s) and contributed to ${((this.modules.soulOfTheForest.rejuvenationHealing/this.totalHealing)*100).toFixed(2)} % / ${formatNumber(this.modules.soulOfTheForest.rejuvenationHealing)} healing</li>
-                <li>Regrowth consumed ${this.modules.soulOfTheForest.regrowths} procc(s) and contributed to ${((this.modules.soulOfTheForest.regrowthHealing/this.totalHealing)*100).toFixed(2)} % / ${formatNumber(this.modules.soulOfTheForest.regrowthHealing)} healing</li>
-              </ul>
-            `}>
-              Soul of the Forest analyzer
-            </dfn>
-          )}
-        />
-      ),
-      !hasMoC && (
-        <StatisticBox
-          icon={<SpellIcon id={SPELLS.CLEARCASTING_BUFF.id} />}
-          value={`${formatPercentage(unusedClearcastings)} %`}
-          label={(
-            <dfn data-tip={`You got total <b>${this.modules.clearcasting.total} clearcasting proccs</b> and <b>used ${this.modules.clearcasting.used}</b> of them. <b>${this.modules.clearcasting.nonCCRegrowths} of your regrowths was used without a clearcasting procc</b>. Using a clearcasting procc as soon as you get it should be one of your top priorities. Even if it overheals you still get that extra mastery stack on a target and the minor HoT. Spending your GCD on a free spell also helps you with mana management in the long run.`}>
-              Unused Clearcastings
-            </dfn>
-          )}
-        />
-      ),
-      (
-        <StatisticBox
-          icon={<Icon icon="petbattle_health-down" alt="Non healing time" />}
-          value={`${formatPercentage(nonHealingTimePercentage)} %`}
-          label={(
-            <dfn data-tip={`Non healing time is available casting time not used for a spell that helps you heal. This can be caused by latency, cast interrupting, not casting anything (e.g. due to movement/stunned), DPSing, etc.<br /><br />You spent ${formatPercentage(deadTimePercentage)}% of your time casting nothing at all.`}>
-              Non healing time
-            </dfn>
-          )}
-        />
-      ),
     ];
 
     results.items = [

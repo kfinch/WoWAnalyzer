@@ -263,7 +263,7 @@ export default {
   SPRING_BLOSSOMS: {
     id: 207386,
     name: 'Spring Blossoms',
-    icon: 'spell_druid_springblossoms',
+    icon: 'inv_misc_trailofflowers',
   },
   SOUL_OF_THE_FOREST_BUFF: {
     id: 114108,
