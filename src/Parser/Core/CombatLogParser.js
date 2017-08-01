@@ -226,6 +226,7 @@ class CombatLogParser {
     const fightDuration = this.fightDuration;
     const getPercentageOfTotal = healingDone => healingDone / this.totalHealing;
     const formatItemHealing = healingDone => `${formatPercentage(getPercentageOfTotal(healingDone))} % / ${formatNumber(healingDone / fightDuration * 1000)} HPS`;
+    const formatItemDamage = damageDone => `${formatThousands(damageDone)} damage / ${formatNumber(damageDone / fightDuration * 1000)} DPS`;
 
     if (this.modules.prydaz.active) {
       results.items.push({
@@ -312,7 +313,9 @@ class CombatLogParser {
     if (this.modules.gnawedThumbRing.active) {
       results.items.push({
         item: ITEMS.GNAWED_THUMB_RING,
-        result: formatItemHealing(this.modules.gnawedThumbRing.healingIncreaseHealing),
+        result: (<dfn data-tip={`The effective healing and damage contributed by Gnawed Thumb Ring`}>
+            {formatItemHealing(this.modules.gnawedThumbRing.healingIncreaseHealing)  + ' / ' + formatItemDamage(this.modules.gnawedThumbRing.damageIncreased)}
+          </dfn>),
       });
     }
     if (this.modules.archiveOfFaith.active) {
