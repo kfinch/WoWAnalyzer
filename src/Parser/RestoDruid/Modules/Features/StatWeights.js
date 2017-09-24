@@ -3,12 +3,13 @@ import SPELLS from 'common/SPELLS';
 import Combatants from 'Parser/Core/Modules/Combatants';
 import HealingValue from 'Parser/Core/Modules/HealingValue';
 
-import { getSpellInfo, HEAL_INFO } from '../Core/SpellInfo';
+import { ABILITIES_AFFECTED_BY_HEALING_INCREASES } from '../../Constants';
+import { HEALS_MASTERY_STACK } from '../../Constants';
 
 const MASTERY_BONUS_FROM_ONE_RATING = 1 / 66666.6666666;
 const BASE_MASTERY_PERCENT = 0.048;
 
-class Mastery extends Module {
+class StatWeights extends Module {
   static dependencies = {
     combatants: Combatants,
   };
@@ -32,10 +33,7 @@ class Mastery extends Module {
   masteryBuffs = {};
 
   on_initialized() {
-    //HEALS_MASTERY_STACK.forEach(healId => this.hotHealingAttrib[healId] = { direct: 0, mastery: {} });
-    Object.entries(HEAL_INFO)
-        .filter(infoEntry => infoEntry[1].masteryStack)
-        .forEach(infoEntry => this.hotHealingAttrib[infoEntry[0]] = { direct: 0, mastery: {} });
+    HEALS_MASTERY_STACK.forEach(healId => this.hotHealingAttrib[healId] = { direct: 0, mastery: {} });
 
     this.masteryBuffs = {
       [SPELLS.ASTRAL_HARMONY.id]: { amount: 4000 },
@@ -57,10 +55,10 @@ class Mastery extends Module {
 
     if (spellId in this.hotHealingAttrib) { this.hotHealingAttrib[spellId].direct += healVal.effective; }
 
-    if (getSpellInfo(spellId).mastery) {
+    if (ABILITIES_AFFECTED_BY_HEALING_INCREASES.includes(spellId)) {
       const hotsOn = target.activeBuffs()
           .map(buffObj => buffObj.ability.guid)
-          .filter(buffId => getSpellInfo(buffId).masteryStack);
+          .filter(buffId => HEALS_MASTERY_STACK.includes(buffId));
       const numHotsOn = hotsOn.length;
       const decomposedHeal = this._decompHeal(healVal, numHotsOn);
 
