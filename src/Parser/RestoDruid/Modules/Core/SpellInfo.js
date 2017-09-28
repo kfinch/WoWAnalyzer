@@ -33,7 +33,7 @@ export const HEAL_INFO = {
     masteryStack: true,
     vers: true,
   },
-  [SPELLS.REGROWTH.id]: { // TODO how handle direct vs HoT? Enteries for direct for now.
+  [SPELLS.REGROWTH.id]: { // TODO how handle direct vs HoT? Entries for direct for now.
     int: true,
     crit: true,
     hasteHpm: false,

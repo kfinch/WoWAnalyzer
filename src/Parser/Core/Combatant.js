@@ -61,40 +61,80 @@ class Combatant extends Entity {
   get critRating() {
     return this._combatantInfo.critSpell;
   }
+  get critRatingPerPercent() {
+    return 400;
+  }
+  get baseCritPercentage() {
+    return 0.08;
+  }
   get critPercentage() {
     // TODO: Look for a way to include Blood Elf racial
-    return 0.08 + this.critRating / 40000;
+    return this.baseCritPercentage + this.critRating / this.critRatingPerPercent / 100;
   }
+
   get hasteRating() {
     return this._combatantInfo.hasteSpell;
   }
-  get hastePercentage() {
-    return this.hasteRating / 37500;
+  get hasteRatingPerPercent()  {
+    return 375;
   }
+  get baseHastePercentage() {
+    return 0;
+  }
+  get hastePercentage() {
+    return this.baseHastePercentage + this.hasteRating / this.hasteRatingPerPercent / 100;
+  }
+
   get masteryRating() {
     return this._combatantInfo.mastery;
   }
-  get masteryPercentage() {
+  get masteryRatingPerPercent() {
     switch (this.spec) {
       case SPECS.HOLY_PALADIN:
-        return 0.12 + this.masteryRating / 26667;
+        return 266.666666667;
       case SPECS.HOLY_PRIEST:
-        return 0.05 + this.masteryRating / 32000;
+        return 320;
       case SPECS.RESTORATION_SHAMAN:
-        return 0.24 + this.masteryRating / 13333.3333333;
+        return 133.333333333;
       case SPECS.ENHANCEMENT_SHAMAN:
-        return 0.2 + this.masteryRating / 13333.3333333;
+        return 133.333333333;
 	    case SPECS.RESTORATION_DRUID:
-	      return 0.048 + this.masteryRating / 66666.6666666;
+	      return 666.666666667;
       default:
         throw new Error('Mastery hasn\'t been implemented for this spec yet.');
     }
   }
+  get baseMasteryPercent() {
+    switch (this.spec) {
+      case SPECS.HOLY_PALADIN:
+        return 0.12;
+      case SPECS.HOLY_PRIEST:
+        return 0.05;
+      case SPECS.RESTORATION_SHAMAN:
+        return 0.24;
+      case SPECS.ENHANCEMENT_SHAMAN:
+        return 0.20;
+	    case SPECS.RESTORATION_DRUID:
+	      return 0.048;
+      default:
+        throw new Error('Mastery hasn\'t been implemented for this spec yet.');
+    }
+  }
+  get masteryPercentage() {
+    return this.baseMasteryPercent + this.masteryRating / this.masteryRatingPerPercent / 100;
+  }
+
   get versatilityRating() {
     return this._combatantInfo.versatilityHealingDone;
   }
+  get versatilityRatingPerPercent() {
+    return 475;
+  }
+  get baseVersatilityPercentage() {
+    return 0;
+  }
   get versatilityPercentage() {
-    return this.versatilityRating / 47500;
+    return this.baseVersatilityPercentage + this.versatilityRating / this.versatilityRatingPerPercent / 100;
   }
 
   // Others
