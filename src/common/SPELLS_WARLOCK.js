@@ -595,6 +595,11 @@ export default {
     name: 'Felstorm',
     icon: 'ability_warrior_bladestorm',
   },
+  WRATHSTORM_BUFF: {
+    id: 115831,
+    name: 'Wrathstorm',
+    icon: 'ability_warrior_bladestorm',
+  },
   SUMMON_FELGUARD: {
     id: 30146,
     name: 'Summon Felguard',
@@ -702,5 +707,12 @@ export default {
     id: 246962,
     name: 'Dreaded Haste',
     icon: 'spell_shadow_metamorphosis',
+  },
+
+  // Demonology legendary effects
+  WAKENERS_LOYALTY: {
+    id: 236200,
+    name: 'Wakener\'s Loyalty',
+    icon: 'inv_offhand_1h_artifactskulloferedar_d_01',
   },
 };
