@@ -67,9 +67,9 @@ class Combatant extends Entity {
   get baseCritPercentage() {
     return 0.08;
   }
-  get critPercentage() {
+  get critPercentage(rating = this.critRating) {
     // TODO: Look for a way to include Blood Elf racial
-    return this.baseCritPercentage + this.critRating / this.critRatingPerPercent / 100;
+    return this.baseCritPercentage + rating / this.critRatingPerPercent / 100;
   }
 
   get hasteRating() {
@@ -81,8 +81,8 @@ class Combatant extends Entity {
   get baseHastePercentage() {
     return 0;
   }
-  get hastePercentage() {
-    return this.baseHastePercentage + this.hasteRating / this.hasteRatingPerPercent / 100;
+  get hastePercentage(rating = this.hasteRating) {
+    return this.baseHastePercentage + rating / this.hasteRatingPerPercent / 100;
   }
 
   get masteryRating() {
@@ -120,8 +120,8 @@ class Combatant extends Entity {
         throw new Error('Mastery hasn\'t been implemented for this spec yet.');
     }
   }
-  get masteryPercentage() {
-    return this.baseMasteryPercent + this.masteryRating / this.masteryRatingPerPercent / 100;
+  get masteryPercentage(rating = this.masteryRating) {
+    return this.baseMasteryPercent + rating / this.masteryRatingPerPercent / 100;
   }
 
   get versatilityRating() {
@@ -133,8 +133,8 @@ class Combatant extends Entity {
   get baseVersatilityPercentage() {
     return 0;
   }
-  get versatilityPercentage() {
-    return this.baseVersatilityPercentage + this.versatilityRating / this.versatilityRatingPerPercent / 100;
+  get versatilityPercentage(rating = this.versatilityRating) {
+    return this.baseVersatilityPercentage + rating / this.versatilityRatingPerPercent / 100;
   }
 
   // Others

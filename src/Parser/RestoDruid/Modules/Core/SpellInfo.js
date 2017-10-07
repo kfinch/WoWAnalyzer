@@ -4,7 +4,7 @@ export const getSpellInfo = id => {
   return HEAL_INFO[id] || DEFAULT_INFO;
 };
 
-const DEFAULT_INFO = {
+const DEFAULT_INFO = { // we assume unlisted spells scale with vers only (this will mostly be trinkets)
   int: false,
   crit: false,
   hasteHpm: false,
@@ -215,6 +215,7 @@ export const HEAL_INFO = {
     vers: false,
   },
   [SPELLS.LEECH.id]: { // after a fashion this scales with everything, but for the purpose of stat weights better to say "nothing"
+    ignored: true,
     int: false,
     crit: false,
     hasteHpm: false,
