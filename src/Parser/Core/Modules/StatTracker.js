@@ -70,6 +70,9 @@ class StatTracker extends Analyzer {
 
     // region Mage
     [SPELLS.WARMTH_OF_THE_PHOENIX.id]: { crit: 800 },
+    [SPELLS.COMBUSTION.id]: {
+      mastery: combatant => combatant.critRating * 0.5, // TODO make it benefit from live crit rather than starting crit
+    },
     // endregion
 
     // region Priest
@@ -196,6 +199,8 @@ class StatTracker extends Analyzer {
         return 0.2;
       case SPECS.RESTORATION_DRUID:
         return 0.048;
+      case SPECS.FIRE_MAGE:
+        return 0.06;
       default:
         throw new Error('Mastery hasn\'t been implemented for this spec yet.');
     }
@@ -235,6 +240,8 @@ class StatTracker extends Analyzer {
         return 13333;
       case SPECS.RESTORATION_DRUID:
         return 66667;
+      case SPECS.FIRE_MAGE:
+        return 53333;
       default:
         throw new Error('Mastery hasn\'t been implemented for this spec yet.');
     }

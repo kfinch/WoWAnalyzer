@@ -235,6 +235,21 @@ export default {
     name: 'Meteor',
     icon: 'spell_mage_meteor',
   },
+  CINDERSTORM_DAMAGE: {
+    id: 198928,
+    name: 'Cinderstorm',
+    icon: 'spell_fire_flare',
+  },
+  MASTERY_IGNITE: {
+    id: 12846,
+    name: 'Mastery: Ignite',
+    icon: 'spell_fire_incinerate',
+  },
+  IGNITE: {
+    id: 12654,
+    name: 'Ignite',
+    icon: 'spell_fire_incinerate',
+  },
 
   //Arcane
   ARCANE_BLAST: {
@@ -316,10 +331,10 @@ export default {
     name: 'Heating Up',
     icon: 'ability_mage_hotstreak',
   },
-  HOT_STREAK: {
-    id: 195283,
-    name: 'Hot Streak',
-    icon: 'ability_mage_hotstreak',
+  HOT_STREAK_BUFF: {
+    id: 48108,
+    name: 'Hot Streak!',
+    icon: 'ability_ironmaidens_grapeshotblast',
   },
   COMBUSTION: {
     id: 190319,
@@ -367,6 +382,11 @@ export default {
     id: 215773,
     name: 'Phoenix Reborn',
     icon: 'inv_sword_1h_artifactfelomelorn_d_01',
+  },
+  EVERBURNING_CONSUMPTION_TRAIT: {
+    id: 194314,
+    name: 'Everburning Consuption',
+    icon: 'ability_felarakkoa_feldetonation_red',
   },
   ERUPTING_INFERNAL_CORE: {
     id: 248147,
