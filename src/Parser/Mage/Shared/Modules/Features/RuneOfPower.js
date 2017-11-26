@@ -14,7 +14,7 @@ const DAMAGE_BONUS = 0.4;
 const RUNE_DURATION = 10;
 const INCANTERS_FLOW_EXPECTED_BOOST = 0.12;
 
-// FIXME due to interactions with Ignite, the damage boost number will be underrated for Fire Mages. Still fine for Arcane and Frost.
+// Due to interactions with Ignite, the damage boost number will be underrated for Fire Mages. Extended version for Fire in spec folder.
 class RuneOfPower extends Analyzer {
 
   static dependencies = {

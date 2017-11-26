@@ -9,6 +9,7 @@ import CooldownThroughputTracker from './Modules/Features/CooldownThroughputTrac
 import CancelledCasts from '../Shared/Modules/Features/CancelledCasts';
 
 import MirrorImage from '../Shared/Modules/Features/MirrorImage';
+import RuneOfPower from './Modules/Features/RuneOfPower';
 import UnstableMagic from '../Shared/Modules/Features/UnstableMagic';
 import Kindling from './Modules/Features/Kindling';
 import PhoenixsFlames from './Modules/Features/PhoenixsFlames';
@@ -36,6 +37,7 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Talents
     mirrorImage: MirrorImage,
+    runeOfPower: RuneOfPower,
     unstableMagic: UnstableMagic,
     kindling: Kindling,
 
