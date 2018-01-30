@@ -6,6 +6,8 @@ class Entity {
 
   /**
    * This also tracks debuffs in the exact same array. There are no parameters to filter results by debuffs. I don't think this should be necessary as debuffs and buffs usually have different spell IDs.
+   *
+   * A buff's timestamp is checked inclusively vs the start time and exclusively vs the end time.
    */
 
   buffs = [];
@@ -18,7 +20,7 @@ class Entity {
    */
   activeBuffs(forTimestamp = null, bufferTime = 0, minimalActiveTime = 0) {
     const currentTimestamp = forTimestamp || this.owner.currentTimestamp;
-    return this.buffs.filter(buff => (currentTimestamp - minimalActiveTime) >= buff.start && (buff.end === null || (buff.end + bufferTime) >= currentTimestamp));
+    return this.buffs.filter(buff => (currentTimestamp - minimalActiveTime) >= buff.start && (buff.end === null || (buff.end + bufferTime) > currentTimestamp));
   }
 
   /**
@@ -47,7 +49,7 @@ class Entity {
     return this.buffs.find(buff =>
       buff.ability.guid === nSpellId &&
       (currentTimestamp - minimalActiveTime) >= buff.start &&
-      (buff.end === null || (buff.end + bufferTime) >= currentTimestamp) &&
+      (buff.end === null || (buff.end + bufferTime) > currentTimestamp) &&
       (sourceID === null || sourceID === buff.sourceID));
   }
 
@@ -71,17 +73,7 @@ class Entity {
   getStackWeightedBuffUptime(buffAbilityId, sourceID = null) {
     return this.buffs
       .filter(buff => (buff.ability.guid === buffAbilityId) && (sourceID === null || sourceID === buff.sourceID))
-      .reduce((totalUptime, buff) => {
-        let startTime;
-        let startStacks;
-        const buffUptime = buff.stackHistory.reduce((stackUptime, stack) => {
-          const result = !startTime ? 0 : (stack.timestamp - startTime) * startStacks;
-          startTime = stack.timestamp;
-          startStacks = stack.stacks;
-          return stackUptime + result;
-        }, 0);
-        return totalUptime + buffUptime;
-      }, 0);
+      .reduce((totalUptime, buff) => totalUptime + (buff.end !== null ? buff.end : this.owner.currentTimestamp) * buff.stacks, 0);
   }
 
   /**

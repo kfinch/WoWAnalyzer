@@ -15,7 +15,7 @@ class Entities extends Analyzer {
   }
 
   on_applybuff(event) {
-    this.applyBuff(event);
+    this.applyBuff(event, false);
   }
   // TODO: Add a sanity check to the `refreshbuff` event that checks if a buff that's being refreshed was applied, if it wasn't it might be a broken pre-combat applied buff not shown in the combatantinfo event
   // We don't store/use durations, so refreshing buff is useless. Removing the buff actually interferes with the `minimalActiveTime` parameter of `getBuff`.
@@ -24,10 +24,10 @@ class Entities extends Analyzer {
   //   this.applyActiveBuff(event);
   // }
   on_applybuffstack(event) {
-    this.updateBuffStack(event);
+    this.updateBuffStack(event, false);
   }
   on_removebuffstack(event) {
-    this.updateBuffStack(event);
+    this.updateBuffStack(event, false);
   }
   on_removebuff(event) {
     this.removeBuff(event);
@@ -65,18 +65,16 @@ class Entities extends Analyzer {
       ...event,
       start: event.timestamp,
       end: null,
-      stackHistory: [{ stacks: 1, timestamp: event.timestamp }],
+      stacks: 1, // initial applybuff counts as 1 stack, and fires a 'changebuffstack' event, even for buffs that can't actually stack.
       isDebuff,
     };
 
-    // The initial buff counts as 1 stack, to make the `changebuffstack` event complete it's fired for all applybuff events, including buffs that aren't actually stackable.
-    buff.stacks = 1;
     this._triggerChangeBuffStack(buff, event.timestamp, 0, 1);
 
     entity.buffs.push(buff);
   }
 
-  updateBuffStack(event) {
+  updateBuffStack(event, isDebuff) {
     if (!this.owner.byPlayer(event) && !this.owner.toPlayer(event)) {
       // We don't need to know about debuffs on bosses or buffs on other players not caused by us, but we do want to know about our outgoing buffs, and other people's buffs on us
       return;
@@ -91,16 +89,24 @@ class Entities extends Analyzer {
       console.log(fightDuration, 'Entities', `Apply buff stack ${event.ability.name} to ${entity.name}`);
     }
 
-    const existingBuff = entity.buffs.find(item => item.ability.guid === event.ability.guid && item.end === null);
+    const existingBuff = entity.buffs.find(item => item.ability.guid === event.ability.guid && item.end === null); // TODO check sourceID too? (use getBuff?)
     if (existingBuff) {
       const oldStacks = existingBuff.stacks || 1; // the original spell counts as 1 stack
-      existingBuff.stacks = event.stack;
-      existingBuff.stackHistory.push({ stacks: event.stack, timestamp: event.timestamp });
+      existingBuff.end = event.timestamp;
 
       this._triggerChangeBuffStack(existingBuff, event.timestamp, oldStacks, existingBuff.stacks);
     } else {
       console.error('Buff stack updated while active buff wasn\'t known. Was this buff applied pre-combat? Maybe we should register the buff with start time as fight start when this happens, but it might also be a basic case of erroneous combatlog ordering.');
     }
+
+    const newBuff = {
+      ...event,
+      start: event.timestamp,
+      end: null,
+      // stacks included automatically in the existing event
+      isDebuff,
+    };
+    entity.buffs.push(newBuff);
   }
 
   removeBuff(event, isDebuff) {
@@ -121,15 +127,13 @@ class Entities extends Analyzer {
     const existingBuff = entity.buffs.find(item => item.ability.guid === event.ability.guid && item.end === null);
     if (existingBuff) {
       existingBuff.end = event.timestamp;
-      existingBuff.stackHistory.push({ stacks: 0, timestamp: event.timestamp });
-
       this._triggerChangeBuffStack(existingBuff, event.timestamp, existingBuff.stacks, 0);
     } else {
       const buff = {
         ...event,
         start: this.owner.fight.start_time,
         end: event.timestamp,
-        stackHistory: [{ stacks: 1, timestamp: this.owner.fight.start_time }, { stacks: 0, timestamp: event.timestamp }],
+        stacks: 1,
         isDebuff,
       };
       entity.buffs.push(buff);
