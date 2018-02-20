@@ -22,7 +22,7 @@ class ComboPointTracker extends ResourceTracker {
 
     // some point generating spells do not have energize events so they are handled here
     if ([SPELLS.THRASH_FERAL.id, SPELLS.CAT_SWIPE.id, SPELLS.BRUTAL_SLASH_TALENT.id].includes(spellId)) {
-      this.processInvisibleEnergize(spellId, 1);
+      this.processInvisibleEnergize(event, 1);
     }
 
     // set bonus can proc "free Ferocious Bite that counts as if it spent the full 5 CPs"

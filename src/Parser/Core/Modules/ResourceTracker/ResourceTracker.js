@@ -12,8 +12,9 @@ class ResourceTracker extends Analyzer {
 
   current = 0;
 
-  // stores resource gained/spent/wasted by ability ID
+  // stores resource building abilities by ID, with info on generated / wasted /casts
   buildersObj = {};
+  // stores resource spending abilities by ID, with info on spent / casts
   spendersObj = {};
 
   // TODO set this to the resource you wish to track on_initialized.. see the appropriate objects in common/RESOURCE_TYPES
@@ -21,13 +22,6 @@ class ResourceTracker extends Analyzer {
 
   // TODO a classes 'main' resource passes the max along with events, but for other resources this may need to be defined
   maxResource;
-
-
-  // FIXME implement natural regen
-  // TODO if the tracked resource naturally regenerates (like Energy), set this to true and set the parameters of the regeneration in the below fields
-  // naturallyRegenerates = false;
-  // baseRegenRate; // TODO resource's base regeneration rate in points per second
-  // isRegenHasted; // TODO iff true, regeneration rate will be scaled with haste
 
   // TODO if you wish an ability to show in results even if it wasn't used, add it using these functions on_initialized
   initBuilderAbility(spellId) {
@@ -50,22 +44,6 @@ class ResourceTracker extends Analyzer {
     this._applyBuilder(spellId, this.getResource(event), gain, waste);
   }
 
-  // FIXME Track resource drains too, so that the 'current' value can be more accurate
-
-  // TODO if a resource gain isn't showing as an energize in events, handle it manually by calling this
-  /**
-   * FIXME solve with a normalizer instead?
-   * Applies an energize of the tracked resource type.
-   * @param {number} spellId - The spellId to attribute the resource gain to
-   * @param {number} amount - The raw amount of resources to gain
-   */
-  processInvisibleEnergize(spellId, amount) {
-    const maxGain = this.maxResource !== undefined ? this.maxResource - this.current : amount;
-    const gain = Math.min(amount, maxGain);
-    const waste = Math.max(amount - maxGain, 0);
-    this._applyBuilder(spellId, null, gain, waste);
-  }
-
   _applyBuilder(spellId, resource, gain, waste) {
     if (!(spellId in this.buildersObj)) {
         this.initBuilderAbility(spellId);
@@ -76,7 +54,7 @@ class ResourceTracker extends Analyzer {
     this.buildersObj[spellId].casts += 1;
 
     // resource.amount for an energize is the amount AFTER the energize
-    if (resource !== null && resource !== undefined && resource.amount !== undefined) {
+    if (!!resource && resource.amount !== undefined) {
       this.current = resource.amount;
       if (resource.max !== undefined) {
         this.maxResource = resource.max; // track changes in max resource, which can happen due to procs / casts
@@ -84,6 +62,34 @@ class ResourceTracker extends Analyzer {
     } else {
       this.current += gain;
     }
+  }
+
+  // FIXME Track resource drains too, so that the 'current' value can be more accurate
+
+  // TODO if an event should have an associated energize but doesn't, fabricate it by calling this
+  /**
+   * Triggers an energize event of the tracked resource type.
+   * Automatically fills in all the fields except the raw gain amount.
+   * @param {object} event - The event triggering the resource gain
+   * @param {number} amount - The raw amount of resources to gain
+   */
+  processInvisibleEnergize(event, amount) {
+    const maxGain = this.maxResource !== undefined ? this.maxResource - this.current : amount;
+    const waste = Math.max(amount - maxGain, 0);
+
+    this.owner.triggerEvent('energize', {
+      timestamp: event.timestamp,
+      type: 'energize',
+      ability: event.ability,
+      sourceID: event.sourceID,
+      sourceIsFriendly: event.sourceIsFriendly,
+      targetID: this.owner.playerId,
+      targetIsFriendly: true,
+      resourceChange: amount,
+      resourceChangeType: this.resource.id,
+      waste,
+      __fabricated: true,
+    });
   }
 
   // SPENDERS - Handled on cast, using the 'classResources' field
@@ -129,7 +135,7 @@ class ResourceTracker extends Analyzer {
     if(!event.classResources) {
       return null;
     } else {
-      return event.classResources.find(r=>r.type === this.resource.id);
+      return event.classResources.find(r => r.type === this.resource.id) || null;
     }
   }
 
