@@ -10,6 +10,8 @@ import FerociousBiteEnergy from './Modules/Features/FerociousBiteEnergy';
 
 import ComboPointTracker from './Modules/ComboPoints/ComboPointTracker';
 import ComboPointDetails from './Modules/ComboPoints/ComboPointDetails';
+import EnergyTracker from './Modules/Energy/EnergyTracker';
+import EnergyDetails from './Modules/Energy/EnergyDetails';
 
 import SavageRoarUptime from './Modules/Talents/SavageRoarUptime';
 import MoonfireUptime from './Modules/Talents/MoonfireUptime';
@@ -40,6 +42,8 @@ class CombatLogParser extends CoreCombatLogParser {
     // resources
     comboPointTracker: ComboPointTracker,
     comboPointDetails: ComboPointDetails,
+    energyTracker: EnergyTracker,
+    energyDetails: EnergyDetails,
 
     // traits
     ashamanesRip: AshamanesRip,
