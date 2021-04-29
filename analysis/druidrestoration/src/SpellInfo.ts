@@ -153,6 +153,15 @@ export const DRUID_HEAL_INFO: ListOfHealerSpellInfo = {
     masteryStack: false,
     vers: true,
   },
+  [SPELLS.ADAPTIVE_SWARM.id]: {
+    int: true,
+    crit: true,
+    hasteHpm: true,
+    hasteHpct: false,
+    mastery: true,
+    masteryStack: true,
+    vers: true,
+  },
   [SPELLS.YSERAS_GIFT_OTHERS.id]: {
     // TODO does it really scale with nothing (except stam)?
     int: false,

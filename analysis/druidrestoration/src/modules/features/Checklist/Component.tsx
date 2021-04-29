@@ -11,6 +11,7 @@ import Requirement from 'parser/shared/modules/features/Checklist/Requirement';
 import Rule from 'parser/shared/modules/features/Checklist/Rule';
 import PropTypes from 'prop-types';
 import React from 'react';
+import COVENANTS from 'game/shadowlands/COVENANTS';
 
 const RestorationDruidChecklist = ({ combatant, castEfficiency, thresholds }: ChecklistProps) => {
   const AbilityRequirement = (props: AbilityRequirementProps) => (
@@ -100,6 +101,9 @@ const RestorationDruidChecklist = ({ combatant, castEfficiency, thresholds }: Ch
       >
         {combatant.hasTalent(SPELLS.CENARION_WARD_TALENT.id) && (
           <AbilityRequirement spell={SPELLS.CENARION_WARD_TALENT.id} />
+        )}
+        {combatant.hasCovenant(COVENANTS.NECROLORD.id) && (
+          <AbilityRequirement spell={SPELLS.ADAPTIVE_SWARM.id} />
         )}
         {combatant.hasTalent(SPELLS.FLOURISH_TALENT.id) && (
           <AbilityRequirement spell={SPELLS.FLOURISH_TALENT.id} />

@@ -1,6 +1,7 @@
 import SPELLS from 'common/SPELLS';
 import ISSUE_IMPORTANCE from 'parser/core/ISSUE_IMPORTANCE';
 import CoreAbilities from 'parser/core/modules/Abilities';
+import COVENANTS from 'game/shadowlands/COVENANTS';
 
 class Abilities extends CoreAbilities {
   spellbook() {
@@ -84,6 +85,18 @@ class Abilities extends CoreAbilities {
           recommendedEfficiency: 0.75,
           averageIssueEfficiency: 0.55,
           majorIssueEfficiency: 0.3,
+        },
+      },
+      {
+        spell: SPELLS.ADAPTIVE_SWARM,
+        category: Abilities.SPELL_CATEGORIES.ROTATIONAL,
+        cooldown: 25, // TODO any modifiers to this?
+        gcd: {
+          base: 1500,
+        },
+        enabled: combatant.hasCovenant(COVENANTS.NECROLORD.id),
+        castEfficiency: {
+          suggestion: true,
         },
       },
       {
