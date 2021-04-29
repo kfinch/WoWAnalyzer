@@ -49,7 +49,7 @@ class AdaptiveSwarm extends Analyzer {
     if (
       target === null ||
       !target.hasBuff(
-        SPELLS.ADAPTIVE_SWARM.id,
+        SPELLS.ADAPTIVE_SWARM_HEAL.id,
         this.owner.currentTimestamp,
         0,
         0,
@@ -62,7 +62,7 @@ class AdaptiveSwarm extends Analyzer {
     // if we got this far, our adaptive swarm is on the heal target
     const spellId = event.ability.guid;
     if (
-      spellId !== SPELLS.ADAPTIVE_SWARM.id && // don't double count
+      spellId !== SPELLS.ADAPTIVE_SWARM_HEAL.id && // don't double count
       getSpellInfo(spellId).masteryStack // TODO is this a reasonable proxy for 'periodic heals' ?
     ) {
       this._periodicBoostAttribution += calculateEffectiveHealing(event, PERIODIC_BOOST);
@@ -71,13 +71,13 @@ class AdaptiveSwarm extends Analyzer {
 
   get directPercent() {
     return this.owner.getPercentageOfTotalHealingDone(
-      this.mastery.getDirectHealing(SPELLS.ADAPTIVE_SWARM.id),
+      this.mastery.getDirectHealing(SPELLS.ADAPTIVE_SWARM_HEAL.id),
     );
   }
 
   get masteryPercent() {
     return this.owner.getPercentageOfTotalHealingDone(
-      this.mastery.getMasteryHealing(SPELLS.ADAPTIVE_SWARM.id),
+      this.mastery.getMasteryHealing(SPELLS.ADAPTIVE_SWARM_HEAL.id),
     );
   }
 

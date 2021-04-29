@@ -1,7 +1,11 @@
 import { change, date } from 'common/changelog';
 import { Adoraci, Yajinni, Abelito75, Zeboot, LeoZhekov, Putro, Vexxra, Tiboonn, Ciuffi, Sref } from 'CONTRIBUTORS';
+import SpellLink from 'interface/SpellLink';
+import SPELLS from 'common/SPELLS';
+import React from 'react';
 
 export default [
+  change(date(2021, 4, 28), <>Added <SpellLink id={SPELLS.ADAPTIVE_SWARM.id} /> support</>, Sref),
   change(date(2021, 4, 28), 'Converted all remaining modules to TypeScript', Sref),
   change(date(2021, 4, 14), 'Converted Mastery to TypeScript', Sref),
   change(date(2021, 4, 3), 'Verified 9.0.5 patch changes and bumped support to 9.0.5', Adoraci),

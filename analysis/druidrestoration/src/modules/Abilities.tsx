@@ -98,6 +98,7 @@ class Abilities extends CoreAbilities {
         castEfficiency: {
           suggestion: true,
         },
+        healSpellIds: [SPELLS.ADAPTIVE_SWARM_HEAL.id],
       },
       {
         spell: SPELLS.WILD_GROWTH,

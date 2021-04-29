@@ -153,7 +153,7 @@ export const DRUID_HEAL_INFO: ListOfHealerSpellInfo = {
     masteryStack: false,
     vers: true,
   },
-  [SPELLS.ADAPTIVE_SWARM.id]: {
+  [SPELLS.ADAPTIVE_SWARM_HEAL.id]: {
     int: true,
     crit: true,
     hasteHpm: true,
