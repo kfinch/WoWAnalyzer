@@ -3,7 +3,7 @@ import COVENANTS from 'game/shadowlands/COVENANTS';
 import Mastery from '../../core/Mastery';
 import SPELLS from 'common/SPELLS';
 import Statistic from 'parser/ui/Statistic';
-import { formatPercentage } from 'common/format';
+import { formatDuration, formatMilliseconds, formatNumber, formatPercentage } from 'common/format';
 import BoringValue from 'parser/ui/BoringValueText';
 import { SpellIcon } from 'interface';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
@@ -12,9 +12,12 @@ import Events, { HealEvent } from 'parser/core/Events';
 import Combatants from 'parser/shared/modules/Combatants';
 import { getSpellInfo } from '../../../SpellInfo';
 import calculateEffectiveHealing from 'parser/core/calculateEffectiveHealing';
+import AbilityTracker from 'parser/shared/modules/AbilityTracker';
+import Enemies from 'parser/shared/modules/Enemies';
 
 const PERIODIC_BOOST = 0.25; // the amount Adaptive Swarm boosts periodic effects
 
+// TODO move to core?
 /**
  * -- Adaptive Swarm --
  * Covenant Ability - Necrolord
@@ -25,11 +28,15 @@ const PERIODIC_BOOST = 0.25; // the amount Adaptive Swarm boosts periodic effect
  */
 class AdaptiveSwarm extends Analyzer {
   static dependencies = {
+    abilityTracker: AbilityTracker,
     combatants: Combatants,
+    enemies: Enemies,
     mastery: Mastery,
   };
 
+  protected abilityTracker!: AbilityTracker;
   protected combatants!: Combatants;
+  protected enemies!: Enemies;
   protected mastery!: Mastery;
 
   // a tally of the healing attributable to Adaptive Swarm's boost on periodic effects
@@ -89,6 +96,30 @@ class AdaptiveSwarm extends Analyzer {
     return this.directPercent + this.masteryPercent + this.periodicBoostPercent;
   }
 
+  get casts() {
+    return this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM.id).casts;
+  }
+
+  get buffUptime() {
+    return this.combatants.getBuffUptime(SPELLS.ADAPTIVE_SWARM_HEAL.id);
+  }
+
+  get buffTimePerCast() {
+    return this.buffUptime / this.casts; // TODO check casts = 0
+  }
+
+  get debuffUptime() {
+    return this.enemies.getBuffUptime(SPELLS.ADAPTIVE_SWARM_DAMAGE.id);
+  }
+
+  get debuffTimePerCast() {
+    return this.debuffUptime / this.casts; // TODO check casts = 0
+  }
+
+  get damagePerSecond() {
+    return this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM_DAMAGE.id).damageEffective / this.owner.fightDuration * 1000; // TODO easier way to get DPS?
+  }
+
   // TODO suggestion thresholds once I know what's reasonable - or don't bother because Adaptive Swarm isn't recommended anyway?
 
   // TODO bounce counter?
@@ -102,8 +133,8 @@ class AdaptiveSwarm extends Analyzer {
         tooltip={
           <>
             This is the sum of the direct healing from Adaptive Swarm, the healing enabled by its
-            extra mastery stack, and the healing enabled by its boost to periodic effects.
-            The damage dealt by Adaptive Swarm isn't considered here.
+            extra mastery stack, and the healing enabled by its boost to periodic effects. It had
+            an average healing uptime per cast of <strong>{(this.buffTimePerCast / 1000).toFixed(0)}s</strong>.
             <ul>
               <li>
                 Direct: <strong>{formatPercentage(this.directPercent)}%</strong>
@@ -115,6 +146,8 @@ class AdaptiveSwarm extends Analyzer {
                 Boost: <strong>{formatPercentage(this.periodicBoostPercent)}%</strong>
               </li>
             </ul>
+            In addition, Adaptive Swarm did <strong>{formatNumber(this.damagePerSecond)}</strong> DPS over the encounter with an
+            average damage uptime per cast of <strong>{(this.debuffTimePerCast / 1000).toFixed(0)}s</strong>.
           </>
         }
       >
