@@ -139,7 +139,6 @@ class AdaptiveSwarm extends Analyzer {
       this.onPeriodicHeal,
     );
 
-
     this.addEventListener(
       Events.damage.by(SELECTED_PLAYER).spell(PERIODIC_DAMAGE),
       this.onPeriodicDamage,

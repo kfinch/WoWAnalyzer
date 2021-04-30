@@ -4,7 +4,9 @@ import { SpellIcon } from 'interface';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import calculateEffectiveHealing from 'parser/core/calculateEffectiveHealing';
 import Events, { HealEvent } from 'parser/core/Events';
+import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import BoringValue from 'parser/ui/BoringValueText';
+import ItemPercentHealingDone from 'parser/ui/ItemPercentHealingDone';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
@@ -61,10 +63,6 @@ class ConfluxOfElements extends Analyzer {
     }
   }
 
-  get totalPercent(): number {
-    return this.owner.getPercentageOfTotalHealingDone(this._healBoostAttribution);
-  }
-
   statistic() {
     return (
       <Statistic
@@ -78,15 +76,10 @@ class ConfluxOfElements extends Analyzer {
           </>
         }
       >
-        <BoringValue
-          label={
-            <>
-              <SpellIcon id={SPELLS.CONFLUX_OF_ELEMENTS.id} /> Conflux of Elements healing
-            </>
-          }
-        >
-          <>{formatPercentage(this.totalPercent)} %</>
-        </BoringValue>
+        <BoringSpellValueText spell={SPELLS.CONFLUX_OF_ELEMENTS}>
+          <ItemPercentHealingDone amount={this._healBoostAttribution} />
+          <br />
+        </BoringSpellValueText>
       </Statistic>
     );
   }

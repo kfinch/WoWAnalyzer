@@ -6,7 +6,9 @@ import calculateEffectiveHealing from 'parser/core/calculateEffectiveHealing';
 import Events, { CastEvent, HealEvent, RemoveBuffEvent } from 'parser/core/Events';
 import { Options } from 'parser/core/Module';
 import Combatants from 'parser/shared/modules/Combatants';
+import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import BoringValue from 'parser/ui/BoringValueText';
+import ItemPercentHealingDone from 'parser/ui/ItemPercentHealingDone';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import React from 'react';
@@ -375,15 +377,10 @@ class Photosynthesis extends Analyzer {
           </>
         }
       >
-        <BoringValue
-          label={
-            <>
-              <SpellIcon id={SPELLS.PHOTOSYNTHESIS_TALENT.id} /> Photosynthesis healing
-            </>
-          }
-        >
-          <>{formatPercentage(this.percentHealing)} %</>
-        </BoringValue>
+        <BoringSpellValueText spell={SPELLS.PHOTOSYNTHESIS_TALENT}>
+          <ItemPercentHealingDone amount={this.totalHealing} />
+          <br />
+        </BoringSpellValueText>
       </Statistic>
     );
   }

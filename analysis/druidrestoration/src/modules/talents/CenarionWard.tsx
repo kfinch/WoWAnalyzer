@@ -2,7 +2,9 @@ import { formatPercentage } from 'common/format';
 import SPELLS from 'common/SPELLS';
 import { SpellIcon } from 'interface';
 import Analyzer, { Options } from 'parser/core/Analyzer';
+import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
 import BoringValue from 'parser/ui/BoringValueText';
+import ItemPercentHealingDone from 'parser/ui/ItemPercentHealingDone';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import React from 'react';
@@ -29,6 +31,7 @@ class CenarionWard extends Analyzer {
     const masteryHealing = this.mastery.getMasteryHealing(SPELLS.CENARION_WARD_HEAL.id);
     const masteryPercent = this.owner.getPercentageOfTotalHealingDone(masteryHealing);
 
+    const totalHealing = directHealing + masteryHealing;
     const totalPercent = directPercent + masteryPercent;
 
     return (
@@ -50,15 +53,10 @@ class CenarionWard extends Analyzer {
           </>
         }
       >
-        <BoringValue
-          label={
-            <>
-              <SpellIcon id={SPELLS.CENARION_WARD_HEAL.id} /> Cenarion Ward healing
-            </>
-          }
-        >
-          <>{formatPercentage(totalPercent)} %</>
-        </BoringValue>
+        <BoringSpellValueText spell={SPELLS.CENARION_WARD_TALENT}>
+          <ItemPercentHealingDone amount={totalHealing} />
+          <br />
+        </BoringSpellValueText>
       </Statistic>
     );
   }
