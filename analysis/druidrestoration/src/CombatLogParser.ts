@@ -30,8 +30,9 @@ import HealingEfficiencyTracker from './modules/features/RestoDruidHealingEffici
 import StatWeights from './modules/features/StatWeights';
 import WildGrowth from './modules/features/WildGrowth';
 import ConfluxOfElements from './modules/shadowlands/conduits/ConfluxOfElements';
+import EvolvedSwarmResto from './modules/shadowlands/conduits/EvolvedSwarmResto';
 import FlashOfClarity from './modules/shadowlands/conduits/FlashOfClarity';
-import AdaptiveSwarm from './modules/shadowlands/covenants/AdaptiveSwarm';
+import AdaptiveSwarmResto from './modules/shadowlands/covenants/AdaptiveSwarmResto';
 import MemoryoftheMotherTree from './modules/shadowlands/legendaries/MemoryoftheMotherTree';
 import VisionOfUnendingGrowrth from './modules/shadowlands/legendaries/VisionOfUnendingGrowth';
 import Abundance from './modules/talents/Abundance';
@@ -109,12 +110,13 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Covenants
     convokeSpirits: ConvokeSpirits,
-    adaptiveSwarm: AdaptiveSwarm,
+    adaptiveSwarm: AdaptiveSwarmResto,
 
     // Conduits
     // Potency
     flashOfClarity: FlashOfClarity,
     confluxOfElements: ConfluxOfElements,
+    evolvedSwarmResto: EvolvedSwarmResto,
 
     //legos
     visionOfUnendingGrowrth: VisionOfUnendingGrowrth,

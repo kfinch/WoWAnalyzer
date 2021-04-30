@@ -38,6 +38,7 @@ const CONFLUX_OF_ELEMENTS_EFFECT_BY_RANK = [
 class ConfluxOfElements extends Analyzer {
   // a tally of the healing attributable to Conflux of Element's boost on heals.
   _healBoostAttribution: number = 0;
+  // the strength of the heal boost, calculated dynamically based on conduit ilvl
   _healBoost: number;
 
   constructor(options: Options) {

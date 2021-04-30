@@ -557,13 +557,16 @@ class CombatLogParser {
     return HasTarget(event) && this.playerPets.some((pet) => pet.id === event.targetID);
   }
 
+  getPerSecond(totalAmount: number): number {
+    return (totalAmount / this.fightDuration) * 1000;
+  }
   getPercentageOfTotalHealingDone(healingDone: number) {
     return healingDone / this.getModule(HealingDone).total.effective;
   }
   formatItemHealingDone(healingDone: number) {
     return `${formatPercentage(
       this.getPercentageOfTotalHealingDone(healingDone),
-    )} % / ${formatNumber((healingDone / this.fightDuration) * 1000)} HPS`;
+    )} % / ${formatNumber(this.getPerSecond(healingDone))} HPS`;
   }
   formatItemAbsorbDone(absorbDone: number) {
     return `${formatNumber(absorbDone)}`;
@@ -572,9 +575,9 @@ class CombatLogParser {
     return damageDone / this.getModule(DamageDone).total.effective;
   }
   formatItemDamageDone(damageDone: number) {
-    return `${formatPercentage(this.getPercentageOfTotalDamageDone(damageDone))} % / ${formatNumber(
-      (damageDone / this.fightDuration) * 1000,
-    )} DPS`;
+    return `${formatPercentage(
+      this.getPercentageOfTotalDamageDone(damageDone),
+    )} % / ${this.getPerSecond(damageDone)} DPS`;
   }
   getPercentageOfTotalDamageTaken(damageTaken: number) {
     return damageTaken / this.getModule(DamageTaken).total.effective;
