@@ -29,8 +29,8 @@ import PrematureRejuvenations from './modules/features/PrematureRejuvenations';
 import HealingEfficiencyTracker from './modules/features/RestoDruidHealingEfficiencyTracker';
 import StatWeights from './modules/features/StatWeights';
 import WildGrowth from './modules/features/WildGrowth';
-import FlashOfClarity from './modules/shadowlands/conduits/FlashOfClarity';
 import ConfluxOfElements from './modules/shadowlands/conduits/ConfluxOfElements';
+import FlashOfClarity from './modules/shadowlands/conduits/FlashOfClarity';
 import AdaptiveSwarm from './modules/shadowlands/covenants/AdaptiveSwarm';
 import MemoryoftheMotherTree from './modules/shadowlands/legendaries/MemoryoftheMotherTree';
 import VisionOfUnendingGrowrth from './modules/shadowlands/legendaries/VisionOfUnendingGrowth';
@@ -46,7 +46,6 @@ import ClearcastingNormalizer from './normalizers/ClearcastingNormalizer';
 import HotApplicationNormalizer from './normalizers/HotApplicationNormalizer';
 import TreeOfLifeNormalizer from './normalizers/TreeOfLifeNormalizer';
 import WildGrowthNormalizer from './normalizers/WildGrowth';
-
 
 class CombatLogParser extends CoreCombatLogParser {
   static abilitiesAffectedByHealingIncreases = ABILITIES_AFFECTED_BY_HEALING_INCREASES;

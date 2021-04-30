@@ -8,17 +8,20 @@ const covenants = {
   //endregion
 
   //region Necrolord
-  ADAPTIVE_SWARM: { // cast
+  ADAPTIVE_SWARM: {
+    // cast
     id: 325727,
     name: 'Adaptive Swarm',
     icon: 'ability_maldraxxus_druid',
   },
-  ADAPTIVE_SWARM_HEAL: { // buff, heal
+  ADAPTIVE_SWARM_HEAL: {
+    // buff, heal
     id: 325748,
     name: 'Adaptive Swarm',
     icon: 'ability_maldraxxus_druid',
   },
-  ADAPTIVE_SWARM_DAMAGE: { // debuff, damage
+  ADAPTIVE_SWARM_DAMAGE: {
+    // debuff, damage
     id: 325733,
     name: 'Adaptive Swarm',
     icon: 'ability_maldraxxus_druid',

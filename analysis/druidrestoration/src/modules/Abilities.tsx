@@ -1,7 +1,7 @@
 import SPELLS from 'common/SPELLS';
+import COVENANTS from 'game/shadowlands/COVENANTS';
 import ISSUE_IMPORTANCE from 'parser/core/ISSUE_IMPORTANCE';
 import CoreAbilities from 'parser/core/modules/Abilities';
-import COVENANTS from 'game/shadowlands/COVENANTS';
 
 class Abilities extends CoreAbilities {
   spellbook() {

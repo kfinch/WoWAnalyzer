@@ -1,20 +1,21 @@
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import COVENANTS from 'game/shadowlands/COVENANTS';
-import Mastery from '../../core/Mastery';
-import SPELLS from 'common/SPELLS';
-import Statistic from 'parser/ui/Statistic';
 import { formatNumber, formatPercentage } from 'common/format';
-import BoringValue from 'parser/ui/BoringValueText';
+import SPELLS from 'common/SPELLS';
+import COVENANTS from 'game/shadowlands/COVENANTS';
 import { SpellIcon } from 'interface';
+import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import calculateEffectiveHealing from 'parser/core/calculateEffectiveHealing';
+import { SpellInfo } from 'parser/core/EventFilter';
+import Events, { HealEvent } from 'parser/core/Events';
+import AbilityTracker from 'parser/shared/modules/AbilityTracker';
+import Combatants from 'parser/shared/modules/Combatants';
+import Enemies from 'parser/shared/modules/Enemies';
+import BoringValue from 'parser/ui/BoringValueText';
+import Statistic from 'parser/ui/Statistic';
+import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import React from 'react';
-import Events, { HealEvent } from 'parser/core/Events';
-import Combatants from 'parser/shared/modules/Combatants';
-import calculateEffectiveHealing from 'parser/core/calculateEffectiveHealing';
-import AbilityTracker from 'parser/shared/modules/AbilityTracker';
-import Enemies from 'parser/shared/modules/Enemies';
-import { SpellInfo } from 'parser/core/EventFilter';
-import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
+
+import Mastery from '../../core/Mastery';
 
 const PERIODIC_BOOST = 0.25; // the amount Adaptive Swarm boosts periodic effects
 
@@ -65,7 +66,10 @@ class AdaptiveSwarm extends Analyzer {
 
     this.active = this.selectedCombatant.hasCovenant(COVENANTS.NECROLORD.id);
 
-    this.addEventListener(Events.heal.by(SELECTED_PLAYER).spell(PERIODIC_HEALS), this.onPeriodicHeal);
+    this.addEventListener(
+      Events.heal.by(SELECTED_PLAYER).spell(PERIODIC_HEALS),
+      this.onPeriodicHeal,
+    );
   }
 
   onPeriodicHeal(event: HealEvent) {
@@ -116,7 +120,7 @@ class AdaptiveSwarm extends Analyzer {
   }
 
   get buffTimePerCast() {
-    return this.casts === 0 ? 0 : (this.buffUptime / this.casts);
+    return this.casts === 0 ? 0 : this.buffUptime / this.casts;
   }
 
   get debuffUptime() {
@@ -124,11 +128,15 @@ class AdaptiveSwarm extends Analyzer {
   }
 
   get debuffTimePerCast() {
-    return this.casts === 0 ? 0 : (this.debuffUptime / this.casts);
+    return this.casts === 0 ? 0 : this.debuffUptime / this.casts;
   }
 
   get damagePerSecond() {
-    return (this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM_DAMAGE.id).damageEffective / this.owner.fightDuration) * 1000;
+    return (
+      (this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM_DAMAGE.id).damageEffective /
+        this.owner.fightDuration) *
+      1000
+    );
   }
 
   // TODO suggestion thresholds once I know what's reasonable - or don't bother because Adaptive Swarm isn't recommended anyway?
@@ -142,8 +150,9 @@ class AdaptiveSwarm extends Analyzer {
         tooltip={
           <>
             This is the sum of the direct healing from Adaptive Swarm, the healing enabled by its
-            extra mastery stack, and the healing enabled by its boost to periodic effects. It had
-            an average healing uptime per cast of <strong>{(this.buffTimePerCast / 1000).toFixed(0)}s</strong>.
+            extra mastery stack, and the healing enabled by its boost to periodic effects. It had an
+            average healing uptime per cast of{' '}
+            <strong>{(this.buffTimePerCast / 1000).toFixed(0)}s</strong>.
             <ul>
               <li>
                 Direct: <strong>{formatPercentage(this.directPercent)}%</strong>
@@ -155,8 +164,9 @@ class AdaptiveSwarm extends Analyzer {
                 Boost: <strong>{formatPercentage(this.periodicBoostPercent)}%</strong>
               </li>
             </ul>
-            In addition, Adaptive Swarm did <strong>{formatNumber(this.damagePerSecond)}</strong> DPS over the encounter with an
-            average damage uptime per cast of <strong>{(this.debuffTimePerCast / 1000).toFixed(0)}s</strong>.
+            In addition, Adaptive Swarm did <strong>{formatNumber(this.damagePerSecond)}</strong>{' '}
+            DPS over the encounter with an average damage uptime per cast of{' '}
+            <strong>{(this.debuffTimePerCast / 1000).toFixed(0)}s</strong>.
           </>
         }
       >

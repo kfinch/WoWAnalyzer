@@ -1,7 +1,7 @@
 import { change, date } from 'common/changelog';
+import SPELLS from 'common/SPELLS';
 import { Adoraci, Yajinni, Abelito75, Zeboot, LeoZhekov, Putro, Vexxra, Tiboonn, Ciuffi, Sref } from 'CONTRIBUTORS';
 import SpellLink from 'interface/SpellLink';
-import SPELLS from 'common/SPELLS';
 import React from 'react';
 
 export default [

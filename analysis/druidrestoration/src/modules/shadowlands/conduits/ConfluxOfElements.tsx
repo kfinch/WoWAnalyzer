@@ -1,14 +1,14 @@
-import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
-import SPELLS from 'common/SPELLS';
-import Statistic from 'parser/ui/Statistic';
 import { formatPercentage } from 'common/format';
-import BoringValue from 'parser/ui/BoringValueText';
+import SPELLS from 'common/SPELLS';
 import { SpellIcon } from 'interface';
+import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
+import calculateEffectiveHealing from 'parser/core/calculateEffectiveHealing';
+import Events, { HealEvent } from 'parser/core/Events';
+import BoringValue from 'parser/ui/BoringValueText';
+import Statistic from 'parser/ui/Statistic';
+import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import React from 'react';
-import Events, { HealEvent } from 'parser/core/Events';
-import calculateEffectiveHealing from 'parser/core/calculateEffectiveHealing';
-import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 
 const CONFLUX_OF_ELEMENTS_EFFECT_BY_RANK = [
   0,
