@@ -11,6 +11,7 @@ import React from 'react';
 import AdaptiveSwarm from '@wowanalyzer/druid/src/shadowlands/covenants/AdaptiveSwarm';
 
 import Mastery from '../../core/Mastery';
+import { formatNumber } from 'common/format';
 
 /**
  * Resto's display module for Adaptive Swarm.
@@ -61,7 +62,7 @@ class AdaptiveSwarmResto extends AdaptiveSwarm {
               </li>
             </ul>
             In addition, Adaptive Swarm did{' '}
-            <strong>{this.owner.formatItemDamageDone(this.totalDamage)}</strong> over the encounter
+            <strong>{formatNumber(this.owner.getPerSecond(this.totalDamage))} DPS</strong> over the encounter
             with an average damage uptime per cast of{' '}
             <strong>{(this.debuffTimePerCast / 1000).toFixed(0)}s</strong>.
           </>

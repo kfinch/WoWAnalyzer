@@ -47,7 +47,13 @@ const PERIODIC_HEALS: SpellInfo[] = [
 ];
 
 const PERIODIC_DAMAGE: SpellInfo[] = [
-  // TODO
+  SPELLS.THRASH_BEAR_DOT,
+  SPELLS.MOONFIRE_BEAR, // apparently the DoT for everyone
+  SPELLS.SUNFIRE,
+  SPELLS.RIP,
+  SPELLS.RAKE, // apparently the direct counts too???
+  SPELLS.RAKE_BLEED,
+  SPELLS.FERAL_FRENZY_DEBUFF,
   // deliberately doesn't include Adaptive Swarm itself to avoid double count
 ];
 
@@ -116,6 +122,16 @@ class AdaptiveSwarm extends Analyzer {
           this.selectedCombatant.conduitRankBySpellID(SPELLS.EVOLVED_SWARM.id)
         ];
       this._totalPeriodicBoost += this._evolvedSwarmPeriodicBoost;
+
+      // listeners for tallying extra boost attribution to direct healing/damaging
+      this.addEventListener(
+        Events.heal.by(SELECTED_PLAYER).spell(SPELLS.ADAPTIVE_SWARM_HEAL),
+        this.onAdaptiveSwarmHeal,
+      );
+      this.addEventListener(
+        Events.damage.by(SELECTED_PLAYER).spell(SPELLS.ADAPTIVE_SWARM_DAMAGE),
+        this.onAdaptiveSwarmDamage,
+      );
     }
 
     this.addEventListener(
@@ -123,8 +139,9 @@ class AdaptiveSwarm extends Analyzer {
       this.onPeriodicHeal,
     );
 
+
     this.addEventListener(
-      Events.damage.by(SELECTED_PLAYER).spell(PERIODIC_HEALS),
+      Events.damage.by(SELECTED_PLAYER).spell(PERIODIC_DAMAGE),
       this.onPeriodicDamage,
     );
   }
@@ -156,6 +173,11 @@ class AdaptiveSwarm extends Analyzer {
     }
   }
 
+  onAdaptiveSwarmHeal(event: HealEvent) {
+    const relativeBoost = this._evolvedSwarmPeriodicBoost / (1 + BASE_PERIODIC_BOOST);
+    this._evolvedSwarmHealingAttribution += calculateEffectiveHealing(event, relativeBoost);
+  }
+
   onPeriodicDamage(event: DamageEvent) {
     const target = this.enemies.getEntity(event);
     if (
@@ -183,68 +205,73 @@ class AdaptiveSwarm extends Analyzer {
     }
   }
 
+  onAdaptiveSwarmDamage(event: DamageEvent) {
+    const relativeBoost = this._evolvedSwarmPeriodicBoost / (1 + BASE_PERIODIC_BOOST);
+    this._evolvedSwarmDamageAttribution += calculateEffectiveDamage(event, relativeBoost);
+  }
+
   /** The total healing done directly by Adaptive Swarm (this includes the boost to itself) */
-  public get directHealing(): number {
-    return this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM_HEAL).healingEffective;
+  get directHealing(): number {
+    return this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM_HEAL.id).healingEffective;
   }
 
   /** The total healing done due to Adaptive Swarm's boost to other periodic effects */
-  public get boostedHealing(): number {
+  get boostedHealing(): number {
     return this._periodicBoostHealingAttribution;
   }
 
   /** The sum total healing due to Adaptive Swarm's direct and boost components */
-  public get totalHealing(): number {
+  get totalHealing(): number {
     return this.directHealing + this.boostedHealing;
   }
 
   /** The total healing done due specifically to Evolved Swarm's extra boost. */
-  public get evolvedSwarmHealing(): number {
+  get evolvedSwarmHealing(): number {
     return this._evolvedSwarmHealingAttribution;
   }
 
   /** The total damage done directly by Adaptive Swarm (this includes the boost to itself) */
-  public get directDamage(): number {
-    return this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM_DAMAGE).damageEffective;
+  get directDamage(): number {
+    return this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM_DAMAGE.id).damageEffective;
   }
 
   /** The total damage done due to Adaptive Swarm's boost to other periodic effects */
-  public get boostedDamage(): number {
+  get boostedDamage(): number {
     return this._periodicBoostDamageAttribution;
   }
 
   /** The sum total damage due to Adaptive Swarm's direct and boost components */
-  public get totalDamage(): number {
+  get totalDamage(): number {
     return this.directDamage + this.boostedDamage;
   }
 
   /** The total damage done due specifically to Evolved Swarm's extra boost */
-  public get evolvedSwarmDamage(): number {
+  get evolvedSwarmDamage(): number {
     return this._evolvedSwarmDamageAttribution;
   }
 
   /** The total number of times the player cast Adaptive Swarm */
-  public get casts(): number {
+  get casts(): number {
     return this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM.id).casts;
   }
 
   /** The total ms of uptime for the player's Adaptive Swarm healing buff (HoT) */
-  public get buffUptime(): number {
+  get buffUptime(): number {
     return this.combatants.getBuffUptime(SPELLS.ADAPTIVE_SWARM_HEAL.id);
   }
 
   /** The average ms of uptime for the player's Adaptive Swarm healing buff (HoT) per cast */
-  public get buffTimePerCast(): number {
+  get buffTimePerCast(): number {
     return this.casts === 0 ? 0 : this.buffUptime / this.casts;
   }
 
   /** The total ms of uptime for the player's Adaptive Swarm damage debuff (DoT) */
-  public get debuffUptime(): number {
+  get debuffUptime(): number {
     return this.enemies.getBuffUptime(SPELLS.ADAPTIVE_SWARM_DAMAGE.id);
   }
 
   /** The average ms of uptime for the player's Adaptive Swarm damage debuff (DoT) per cast */
-  public get debuffTimePerCast(): number {
+  get debuffTimePerCast(): number {
     return this.casts === 0 ? 0 : this.debuffUptime / this.casts;
   }
 }

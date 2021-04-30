@@ -577,7 +577,7 @@ class CombatLogParser {
   formatItemDamageDone(damageDone: number) {
     return `${formatPercentage(
       this.getPercentageOfTotalDamageDone(damageDone),
-    )} % / ${this.getPerSecond(damageDone)} DPS`;
+    )} % / ${formatNumber(this.getPerSecond(damageDone))} DPS`;
   }
   getPercentageOfTotalDamageTaken(damageTaken: number) {
     return damageTaken / this.getModule(DamageTaken).total.effective;
