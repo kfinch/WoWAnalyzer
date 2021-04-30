@@ -3,21 +3,38 @@ import COVENANTS from 'game/shadowlands/COVENANTS';
 import Mastery from '../../core/Mastery';
 import SPELLS from 'common/SPELLS';
 import Statistic from 'parser/ui/Statistic';
-import { formatDuration, formatMilliseconds, formatNumber, formatPercentage } from 'common/format';
+import { formatNumber, formatPercentage } from 'common/format';
 import BoringValue from 'parser/ui/BoringValueText';
 import { SpellIcon } from 'interface';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
 import React from 'react';
 import Events, { HealEvent } from 'parser/core/Events';
 import Combatants from 'parser/shared/modules/Combatants';
-import { getSpellInfo } from '../../../SpellInfo';
 import calculateEffectiveHealing from 'parser/core/calculateEffectiveHealing';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import Enemies from 'parser/shared/modules/Enemies';
+import { SpellInfo } from 'parser/core/EventFilter';
+import STATISTIC_CATEGORY from 'parser/ui/STATISTIC_CATEGORY';
 
 const PERIODIC_BOOST = 0.25; // the amount Adaptive Swarm boosts periodic effects
 
-// TODO move to core?
+const PERIODIC_HEALS: SpellInfo[] = [
+  SPELLS.REJUVENATION,
+  SPELLS.REJUVENATION_GERMINATION,
+  SPELLS.REGROWTH,
+  SPELLS.WILD_GROWTH,
+  SPELLS.CULTIVATION,
+  SPELLS.SPRING_BLOSSOMS,
+  SPELLS.CENARION_WARD_HEAL,
+  SPELLS.FRENZIED_REGENERATION,
+  SPELLS.LIFEBLOOM_HOT_HEAL,
+  SPELLS.LIFEBLOOM_DTL_HOT_HEAL,
+  SPELLS.TRANQUILITY_HEAL,
+  SPELLS.EFFLORESCENCE_HEAL,
+  // deliberately doesn't include Adaptive Swarm itself to avoid double count
+];
+
+// TODO update to be applicable to all druid specs and move to core?
 /**
  * -- Adaptive Swarm --
  * Covenant Ability - Necrolord
@@ -48,10 +65,10 @@ class AdaptiveSwarm extends Analyzer {
 
     this.active = this.selectedCombatant.hasCovenant(COVENANTS.NECROLORD.id);
 
-    this.addEventListener(Events.heal.by(SELECTED_PLAYER), this.onHeal);
+    this.addEventListener(Events.heal.by(SELECTED_PLAYER).spell(PERIODIC_HEALS), this.onPeriodicHeal);
   }
 
-  onHeal(event: HealEvent) {
+  onPeriodicHeal(event: HealEvent) {
     const target = this.combatants.getEntity(event);
     if (
       target === null ||
@@ -67,13 +84,7 @@ class AdaptiveSwarm extends Analyzer {
     }
 
     // if we got this far, our adaptive swarm is on the heal target
-    const spellId = event.ability.guid;
-    if (
-      spellId !== SPELLS.ADAPTIVE_SWARM_HEAL.id && // don't double count
-      getSpellInfo(spellId).masteryStack // TODO is this a reasonable proxy for 'periodic heals' ?
-    ) {
-      this._periodicBoostAttribution += calculateEffectiveHealing(event, PERIODIC_BOOST);
-    }
+    this._periodicBoostAttribution += calculateEffectiveHealing(event, PERIODIC_BOOST);
   }
 
   get directPercent() {
@@ -105,7 +116,7 @@ class AdaptiveSwarm extends Analyzer {
   }
 
   get buffTimePerCast() {
-    return this.buffUptime / this.casts; // TODO check casts = 0
+    return this.casts === 0 ? 0 : (this.buffUptime / this.casts);
   }
 
   get debuffUptime() {
@@ -113,23 +124,21 @@ class AdaptiveSwarm extends Analyzer {
   }
 
   get debuffTimePerCast() {
-    return this.debuffUptime / this.casts; // TODO check casts = 0
+    return this.casts === 0 ? 0 : (this.debuffUptime / this.casts);
   }
 
   get damagePerSecond() {
-    return this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM_DAMAGE.id).damageEffective / this.owner.fightDuration * 1000; // TODO easier way to get DPS?
+    return (this.abilityTracker.getAbility(SPELLS.ADAPTIVE_SWARM_DAMAGE.id).damageEffective / this.owner.fightDuration) * 1000;
   }
 
   // TODO suggestion thresholds once I know what's reasonable - or don't bother because Adaptive Swarm isn't recommended anyway?
 
-  // TODO bounce counter?
-
-  // TODO incorporate the damage into this stats?
   statistic() {
     return (
       <Statistic
         size="flexible"
-        position={STATISTIC_ORDER.OPTIONAL(20)}
+        position={STATISTIC_ORDER.CORE(0)}
+        category={STATISTIC_CATEGORY.COVENANTS}
         tooltip={
           <>
             This is the sum of the direct healing from Adaptive Swarm, the healing enabled by its
