@@ -1,13 +1,11 @@
 import { formatPercentage } from 'common/format';
 import SPELLS from 'common/SPELLS';
-import { SpellIcon } from 'interface';
 import Analyzer, { SELECTED_PLAYER } from 'parser/core/Analyzer';
 import calculateEffectiveHealing from 'parser/core/calculateEffectiveHealing';
 import Events, { CastEvent, HealEvent, RemoveBuffEvent } from 'parser/core/Events';
 import { Options } from 'parser/core/Module';
 import Combatants from 'parser/shared/modules/Combatants';
 import BoringSpellValueText from 'parser/ui/BoringSpellValueText';
-import BoringValue from 'parser/ui/BoringValueText';
 import ItemPercentHealingDone from 'parser/ui/ItemPercentHealingDone';
 import Statistic from 'parser/ui/Statistic';
 import STATISTIC_ORDER from 'parser/ui/STATISTIC_ORDER';
