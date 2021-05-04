@@ -5,8 +5,8 @@ import SpellLink from 'interface/SpellLink';
 import React from 'react';
 
 export default [
-  change(date(2021, 4, 28), <>Added <SpellLink id={SPELLS.ADAPTIVE_SWARM.id} /> support</>, Sref),
-  change(date(2021, 4, 28), 'Converted all remaining modules to TypeScript', Sref),
+  change(date(2021, 5, 5), <>Added <SpellLink id={SPELLS.ADAPTIVE_SWARM.id} /> support</>, Sref),
+  change(date(2021, 5, 4), 'Converted all remaining modules to TypeScript and updated HoT Tracking in preparation for future work', Sref),
   change(date(2021, 4, 14), 'Converted Mastery to TypeScript', Sref),
   change(date(2021, 4, 3), 'Verified 9.0.5 patch changes and bumped support to 9.0.5', Adoraci),
   change(date(2021, 2, 12), 'Added form tracking to the convoke module', Ciuffi),
