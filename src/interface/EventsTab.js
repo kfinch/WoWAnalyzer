@@ -126,6 +126,10 @@ class EventsTab extends React.Component {
       obj[type] = false;
       return obj;
     }, {});
+    this.toggleAllOn = Object.keys(FILTERABLE_TYPES).reduce((obj, type) => {
+      obj[type] = true;
+      return obj;
+    }, {});
   }
 
   findEntity(id) {
@@ -221,6 +225,10 @@ class EventsTab extends React.Component {
     this.setState(this.toggleAllOff);
   }
 
+  toggleAllFiltersOn() {
+    this.setState(this.toggleAllOn);
+  }
+
   renderSearchBox() {
     return (
       <input
@@ -297,7 +305,12 @@ class EventsTab extends React.Component {
             <br />
             <div className="flex" style={{ paddingLeft: 5 }}>
               <button className="btn btn-link" onClick={() => this.toggleAllFiltersOff()}>
-                Toggle off all filters
+                Toggle off all event types
+              </button>
+            </div>
+            <div className="flex" style={{ paddingLeft: 5 }}>
+              <button className="btn btn-link" onClick={() => this.toggleAllFiltersOn()}>
+                Toggle on all event types
               </button>
             </div>
             <br />
