@@ -11,6 +11,7 @@ import BalanceOfAllThingsOpener from './modules/features/BalanceOfAllThingsOpene
 import Buffs from './modules/features/Buffs';
 import CancelledCasts from './modules/features/CancelledCasts';
 import Checklist from './modules/features/Checklist/Module';
+import CooldownActiveTime from './modules/features/CooldownActiveTime';
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
 import EarlyDotRefreshes from './modules/features/EarlyDotRefreshes';
 import EarlyDotRefreshesInstants from './modules/features/EarlyDotRefreshesInstants';
@@ -36,6 +37,7 @@ class CombatLogParser extends MainCombatLogParser {
     //Features
     checklist: Checklist,
     alwaysBeCasting: AlwaysBeCasting,
+    cooldownActiveTime: CooldownActiveTime,
     cancelledCasts: CancelledCasts,
     channeling: Channeling,
     abilities: Abilities,

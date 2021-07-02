@@ -11,6 +11,7 @@ import AstralPowerDetails from '../../resourcetracker/AstralPowerDetails';
 import StellarFlareUptime from '../../talents/StellarFlareUptime';
 import AlwaysBeCasting from '../AlwaysBeCasting';
 import CancelledCasts from '../CancelledCasts';
+import CooldownActiveTime from '../CooldownActiveTime';
 import EarlyDotRefreshes from '../EarlyDotRefreshes';
 import EarlyDotRefreshesInstants from '../EarlyDotRefreshesInstants';
 import MoonfireUptime from '../MoonfireUptime';
@@ -24,6 +25,7 @@ class Checklist extends BaseModule {
     castEfficiency: CastEfficiency,
     preparationRuleAnalyzer: PreparationRuleAnalyzer,
     alwaysBeCasting: AlwaysBeCasting,
+    cooldownActiveTime: CooldownActiveTime,
     cancelledCasts: CancelledCasts,
     moonfireUptime: MoonfireUptime,
     sunfireUptime: SunfireUptime,
@@ -39,6 +41,7 @@ class Checklist extends BaseModule {
   protected castEfficiency!: CastEfficiency;
   protected preparationRuleAnalyzer!: PreparationRuleAnalyzer;
   protected alwaysBeCasting!: AlwaysBeCasting;
+  protected cooldownActiveTime!: CooldownActiveTime;
   protected cancelledCasts!: CancelledCasts;
   protected moonfireUptime!: MoonfireUptime;
   protected sunfireUptime!: SunfireUptime;
@@ -58,7 +61,8 @@ class Checklist extends BaseModule {
         thresholds={{
           ...this.preparationRuleAnalyzer.thresholds,
 
-          downtime: this.alwaysBeCasting.suggestionThresholds,
+          uptime: this.alwaysBeCasting.suggestionThresholds,
+          cooldownUptime: this.cooldownActiveTime.cooldownActiveTimeThresholds,
           cancelledCasts: this.cancelledCasts.suggestionThresholds,
           moonfireUptime: this.moonfireUptime.suggestionThresholds,
           sunfireUptime: this.sunfireUptime.suggestionThresholds,

@@ -46,7 +46,24 @@ const BalanceDruidChecklist = ({ combatant, castEfficiency, thresholds }: any) =
         </>
       }
     >
-      <Requirement name="Active Time" thresholds={thresholds.downtime} />
+      <Requirement name="Active Time" thresholds={thresholds.uptime} />
+      <Requirement
+        name="Cooldown Active Time"
+        tooltip={
+          <>
+            This is the uptime specifically during your major DPS cooldowns -{' '}
+            <SpellLink id={cooldownAbility(combatant).id} />
+            {combatant.hasCovenant(COVENANTS.VENTHYR.id) && (
+              <>
+                and <SpellLink id={SPELLS.RAVENOUS_FRENZY.id} />
+              </>
+            )}
+            <br />
+            Planning your cooldowns to maximize uptime is especcially important.
+          </>
+        }
+        thresholds={thresholds.cooldownUptime}
+      />
       <Requirement name="Cancelled Casts" thresholds={thresholds.cancelledCasts} />
     </Rule>
   );
