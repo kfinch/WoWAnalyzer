@@ -21,6 +21,8 @@ const MINOR_DOWNTIME_THRESHOLD = 0.03;
 const AVERAGE_DOWNTIME_THRESHOLD = 0.06;
 const MAJOR_DOWNTIME_THRESHOLD = 0.1;
 
+const DEBUG = true;
+
 /**
  * Like 'AlwaysBeCasting', but specifically checks during major throughput cooldowns.
  * TODO generalize this for use by other specs (changing only Cooldown Buffs specification)
@@ -84,9 +86,18 @@ class CooldownActiveTime extends Analyzer {
     }
     const start = this.lastCdStart;
     const end = event.timestamp;
+    const cdTime = end - start;
+    const cdActiveTime = this.filteredActiveTime.getActiveTime(start, end);
+    DEBUG &&
+      console.log(`CD @ ${this.owner.formatTimestamp(start)} - ${this.owner.formatTimestamp(
+        end,
+      )}${' '}
+      | duration=${cdTime} active=${cdActiveTime}`);
+
+    this.cooldownTotalTime += cdTime;
+    this.cooldownActiveTime += cdActiveTime;
+
     this.cdPeriods.push({ start, end });
-    this.cooldownTotalTime += end - start;
-    this.cooldownActiveTime += this.filteredActiveTime.getActiveTime(start, end);
     this.lastCdStart = undefined;
   }
 
