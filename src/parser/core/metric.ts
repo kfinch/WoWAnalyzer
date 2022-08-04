@@ -3,15 +3,25 @@ import { AnyEvent } from './Events';
 import Ability from './modules/Ability';
 import { PetInfo } from './Pet';
 
+/** Info about the selected fight and combatant */
 export interface Info {
+  /** ID of the selected combatant */
   playerId: number;
+  /** The selected player's pet info */
   pets: PetInfo[];
+  /** The selected player's spellbook */
   abilities: Ability[];
+  /** Timestamp of the fight's start, in milliseconds since logging started */
   fightStart: number;
+  /** Timestamp of the fight's end, in milliseconds since logging started */
   fightEnd: number;
+  /** The fight's duration, in milliseconds */
   fightDuration: number;
+  /** The fight ID within the log - used for making custom queries */
   fightId: number;
+  /** The report code this fight is a part of - used for making custom queries */
   reportCode: string;
+  /** The selected combatant */
   combatant: Combatant;
 }
 

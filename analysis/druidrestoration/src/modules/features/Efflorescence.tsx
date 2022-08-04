@@ -4,8 +4,8 @@ import SPELLS from 'common/SPELLS';
 import { SpellIcon, SpellLink, TooltipElement } from 'interface';
 import Analyzer, { Options, SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events, { CastEvent, HealEvent } from 'parser/core/Events';
-import { ClosedTimePeriod, mergeTimePeriods, OpenTimePeriod } from 'parser/core/mergeTimePeriods';
 import { ThresholdStyle, When } from 'parser/core/ParseResults';
+import { ClosedTimePeriod, OpenEndTimePeriod, union } from 'parser/core/timePeriods';
 import UptimeStackBar from 'parser/ui/UptimeStackBar';
 
 const DURATION_MS = 30000;
@@ -16,7 +16,7 @@ const EFFLO_BG_COLOR = '#cca7a7';
 
 class Efflorescence extends Analyzer {
   /** list of time periods when efflo was active */
-  effloUptimes: OpenTimePeriod[] = [];
+  effloUptimes: OpenEndTimePeriod[] = [];
   /** true iff we've seen at least one Efflo cast */
   hasCast: boolean = false;
 
@@ -70,7 +70,10 @@ class Efflorescence extends Analyzer {
         ut.end = Math.min(ut.start + DURATION_MS, this.owner.currentTimestamp);
       }
     });
-    return mergeTimePeriods(this.effloUptimes, this.owner.currentTimestamp);
+    return union(this.effloUptimes, {
+      start: this.owner.fight.start_time,
+      end: this.owner.currentTimestamp,
+    });
   }
 
   /** Builds an artificial uptimes array that extrapolates based on number of targets hit */
