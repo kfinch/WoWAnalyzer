@@ -1,76 +1,83 @@
-import { AnyEvent, EventType, GlobalCooldownEvent } from 'parser/core/Events';
+import { AnyEvent, BeginChannelEvent, EventType, GlobalCooldownEvent } from 'parser/core/Events';
 import metric, { Info } from 'parser/core/metric';
 import { ClosedTimePeriod, duration, intersection, union } from 'parser/core/timePeriods';
 
 /** Represents a time period when a spell was on GCD or being cast/channeled */
-export type SpellTimePeriod = ClosedTimePeriod & { spellId: number; type: 'gcd' | 'channel' };
+export type SpellTimePeriod = ClosedTimePeriod & { spellId: number };
 
 /**
- * Time periods the player was channeling during the encounter.
+ * Time periods when the player was active over the course of an encounter, either channeling
+ * or in a GCD. These time periods are separated by ability and are possibly overlapping.
  * Note that 'channeling' here refers to anything with a cast time.
- * Depends on the fabricated beginchannel and endchannel events.
+ * Depends on the fabricated beginchannel, endchannel, and globalcooldown events.
  */
-export const channelTimePeriods = metric((events: AnyEvent[], info: Info): SpellTimePeriod[] => {
-  /*
-   * Method:
-   * All completed channels can be calculated by just using the endchannel event,
-   * which links back to the matching beginchannel. Cancelled channels must be ignored because
-   * there's no way of knowing when they were cancelled. The one special case is a channel that is
-   * started but the encounter ends before it finishes.
-   */
-  let uncoveredUncancelledBeginChannelTime: number | undefined = undefined;
-  let uncoveredUncancelledBeginChannelId: number | undefined = undefined;
-  const results: SpellTimePeriod[] = events.reduce((acc: SpellTimePeriod[], event) => {
-    if (event.type === EventType.BeginChannel && !event.isCancelled) {
-      uncoveredUncancelledBeginChannelTime = event.timestamp;
-      uncoveredUncancelledBeginChannelId = event.ability.guid;
-    } else if (event.type === EventType.EndChannel) {
-      acc.push({
-        start: event.beginChannel.timestamp,
-        end: event.timestamp,
-        spellId: event.ability.guid,
-        type: 'channel',
+export const spellActiveTimePeriods = metric(
+  (events: AnyEvent[], info: Info): SpellTimePeriod[] => {
+    /*
+     * Approach:
+     *
+     * Instant cast spells are 'active' for the duration of the GCD, which we add on those events.
+     *
+     * Completed channels can be calculated using the endchannel event, which links back to the
+     * matching beginchannel. In rare cases, the GCD for a channel could be longer than the channel,
+     * so we save previous GCD to doublecheck that.
+     *
+     * Cancelled channels don't show when they were cancelled, so we just treat them as a GCD,
+     * handled again via the GCD event.
+     *
+     * A final special case is a channel that is started, but then the encounter ends before
+     * it finishes - we handle this at the end.
+     */
+    let uncoveredUncancelledBeginChannel: BeginChannelEvent | null = null;
+    let lastCastTimeGcd: GlobalCooldownEvent | null = null;
+    const results: SpellTimePeriod[] = events.reduce((acc: SpellTimePeriod[], event) => {
+      if (event.type === EventType.BeginChannel && !event.isCancelled) {
+        uncoveredUncancelledBeginChannel = event;
+      } else if (event.type === EventType.EndChannel) {
+        let end = event.timestamp;
+        if (lastCastTimeGcd && lastCastTimeGcd.trigger === event.beginChannel) {
+          end = Math.max(end, lastCastTimeGcd.timestamp + lastCastTimeGcd.duration);
+        }
+        acc.push({
+          start: event.beginChannel.timestamp,
+          end,
+          spellId: event.ability.guid,
+        });
+        uncoveredUncancelledBeginChannel = null;
+        lastCastTimeGcd = null;
+      } else if (event.type === EventType.GlobalCooldown) {
+        if (event.trigger.type === EventType.Cast || event.trigger.isCancelled) {
+          // this is an instant on the GCD or a cancelled channel
+          acc.push({
+            start: event.timestamp,
+            end: event.timestamp + event.duration,
+            spellId: event.ability.guid,
+          });
+        } else {
+          // this is the GCD overlapping an actual cast - either could be longer
+          lastCastTimeGcd = event;
+        }
+      }
+      return acc;
+    }, []);
+
+    // handle special case of channel in progress when encounter ends
+    if (uncoveredUncancelledBeginChannel !== null) {
+      // typecast needed because typecheck doesn't 'see' the assignments inside the reduce
+      results.push({
+        start: (uncoveredUncancelledBeginChannel as BeginChannelEvent).timestamp,
+        end: info.fightEnd,
+        spellId: (uncoveredUncancelledBeginChannel as BeginChannelEvent).ability.guid,
       });
-      uncoveredUncancelledBeginChannelTime = undefined;
-      uncoveredUncancelledBeginChannelId = undefined;
     }
-    return acc;
-  }, []);
 
-  // handle special case of channel in progress when encounter ends
-  if (
-    uncoveredUncancelledBeginChannelTime !== undefined &&
-    uncoveredUncancelledBeginChannelId !== undefined
-  ) {
-    results.push({
-      start: uncoveredUncancelledBeginChannelTime,
-      end: info.fightEnd,
-      spellId: uncoveredUncancelledBeginChannelId,
-      type: 'channel',
-    });
-  }
-  return results;
-});
-
-/**
- * Time periods the player was in a global cooldown during the encounter.
- * In cases where the haste isn't quite right or abilities are misspecified,
- * the returned time periods may have some overlap.
- */
-export const gcdTimePeriods = metric((events: AnyEvent[], info: Info): SpellTimePeriod[] =>
-  events
-    .filter((event): event is GlobalCooldownEvent => event.type === EventType.GlobalCooldown)
-    .map((gcdEvent) => ({
-      start: gcdEvent.timestamp,
-      end: gcdEvent.timestamp + gcdEvent.duration,
-      spellId: gcdEvent.ability.guid,
-      type: 'gcd',
-    })),
+    return results;
+  },
 );
 
 /** The (non-overlapping) time periods the player was active during the encounter */
 export const activeTimePeriods = metric((events: AnyEvent[], info: Info): ClosedTimePeriod[] =>
-  union(channelTimePeriods(events, info).concat(gcdTimePeriods(events, info)), {
+  union(spellActiveTimePeriods(events, info), {
     start: info.fightStart,
     end: info.fightEnd,
   }),
@@ -81,6 +88,16 @@ export const activeTimePercent = metric((events: AnyEvent[], info: Info): number
   const { fightStart, fightEnd } = info;
   return duration(activeTimePeriods(events, info)) / (fightEnd - fightStart);
 });
+
+/** The (possibly overlapping) time periods of player spell casting during a given subset of the encounter */
+export const spellActiveTimePeriodSubset = (
+  events: AnyEvent[],
+  info: Info,
+  subset: ClosedTimePeriod,
+): SpellTimePeriod[] =>
+  spellActiveTimePeriods(events, info)
+    .map((t) => intersection(t, subset))
+    .filter((t): t is SpellTimePeriod => t !== null);
 
 /** The (non-overlapping) time periods the player was active during a given subset of the encounter */
 export const activeTimePeriodSubset = (

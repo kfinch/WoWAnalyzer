@@ -43,7 +43,8 @@ export function duration(time: ClosedTimePeriod | ClosedTimePeriod[]): number {
 
 /**
  * Gets the logical intersection of two time periods, at least one of which must be closed
- * @return a closed time period representing the intersection of the two period,
+ * @return a closed time period representing the intersection of the two periods
+ *   (extra fields within the open time period are preserved in the return object),
  *   or null if the time periods do not overlap
  */
 export function intersection(
@@ -53,7 +54,7 @@ export function intersection(
   const start =
     time.start === undefined ? closedTime.start : Math.max(time.start, closedTime.start);
   const end = time.end === undefined ? closedTime.end : Math.min(time.end, closedTime.end);
-  return start >= end ? null : { start, end };
+  return start >= end ? null : { ...time, start, end };
 }
 
 /*
