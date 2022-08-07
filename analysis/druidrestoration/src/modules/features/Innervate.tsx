@@ -43,8 +43,10 @@ class Innervate extends Analyzer {
       return;
     }
 
-    //okay what did we actually do in innervate
-    if (this.selectedCombatant.hasBuff(SPELLS.INNERVATE.id)) {
+    //okay what did we actually do in innervate (tracking own innervate only here)
+    if (
+      this.selectedCombatant.hasBuff(SPELLS.INNERVATE.id, null, 0, 0, this.selectedCombatant.id)
+    ) {
       if (!CASTS_THAT_ARENT_CASTS.includes(event.ability.guid) && this.castTrackers.length > 0) {
         // we want to at least keep track of all abilites during the innervate, not just ones that cost mana
         this.castTrackers[this.castTrackers.length - 1].casts.push(event);

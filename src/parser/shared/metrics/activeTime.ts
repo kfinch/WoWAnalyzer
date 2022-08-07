@@ -2,8 +2,28 @@ import { AnyEvent, BeginChannelEvent, EventType, GlobalCooldownEvent } from 'par
 import metric, { Info } from 'parser/core/metric';
 import { ClosedTimePeriod, duration, intersection, union } from 'parser/core/timePeriods';
 
-/** Represents a time period when a spell was on GCD or being cast/channeled */
-export type SpellTimePeriod = ClosedTimePeriod & { spellId: number };
+/**
+ * Effectively a distilled representation of a CastEvent
+ * with only the spellId and the timestamp.
+ */
+export type SpellCast = {
+  /** The ID of the spell being cast */
+  spellId: number;
+  /** The time the spell cast completed. */
+  castTimestamp: number;
+};
+
+/**
+ * A spell cast that has a GCD and/or cast time.
+ * The time period represents when the player was either inside the GCD from the cast
+ * or actively channeling the spell.
+ *
+ * castTimestamp will typically be the start time of the period for instants and the end time
+ * of the period for cast time spells, although it could be in the middle for a cast time spell
+ * that's faster than the GCD.
+ *
+ */
+export type SpellTimePeriod = ClosedTimePeriod & SpellCast;
 
 /**
  * Time periods when the player was active over the course of an encounter, either channeling
@@ -42,6 +62,7 @@ export const spellActiveTimePeriods = metric(
           start: event.beginChannel.timestamp,
           end,
           spellId: event.ability.guid,
+          castTimestamp: event.timestamp,
         });
         uncoveredUncancelledBeginChannel = null;
         lastCastTimeGcd = null;
@@ -52,6 +73,7 @@ export const spellActiveTimePeriods = metric(
             start: event.timestamp,
             end: event.timestamp + event.duration,
             spellId: event.ability.guid,
+            castTimestamp: event.timestamp,
           });
         } else {
           // this is the GCD overlapping an actual cast - either could be longer
@@ -68,6 +90,7 @@ export const spellActiveTimePeriods = metric(
         start: (uncoveredUncancelledBeginChannel as BeginChannelEvent).timestamp,
         end: info.fightEnd,
         spellId: (uncoveredUncancelledBeginChannel as BeginChannelEvent).ability.guid,
+        castTimestamp: (uncoveredUncancelledBeginChannel as BeginChannelEvent).timestamp,
       });
     }
 
@@ -108,3 +131,9 @@ export const activeTimePeriodSubset = (
   activeTimePeriods(events, info)
     .map((t) => intersection(t, subset))
     .filter((t): t is ClosedTimePeriod => t !== null);
+
+export const activeTimeSubsetPercent = (
+  events: AnyEvent[],
+  info: Info,
+  subset: ClosedTimePeriod,
+): number => duration(activeTimePeriodSubset(events, info, subset)) / (subset.end - subset.start);
