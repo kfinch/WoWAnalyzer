@@ -15,6 +15,7 @@ import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
 import Checklist from './modules/checklist/Module';
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
 import EnergyDetails from 'analysis/retail/druid/feral/modules/core/energy/EnergyDetails';
+import EnergyGraph from 'analysis/retail/druid/feral/modules/core/energy/EnergyGraph';
 import EnergyTracker from 'analysis/retail/druid/feral/modules/core/energy/EnergyTracker';
 import SpellEnergyCost from 'analysis/retail/druid/feral/modules/core/energy/SpellEnergyCost';
 import SpellUsable from './modules/features/SpellUsable';
@@ -53,6 +54,7 @@ class CombatLogParser extends CoreCombatLogParser {
     spellUsable: SpellUsable,
     energyTracker: EnergyTracker,
     energyDetails: EnergyDetails,
+    energyGraph: EnergyGraph,
     checklist: Checklist,
 
     // bleeds
