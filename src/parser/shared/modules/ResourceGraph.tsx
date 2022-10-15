@@ -4,26 +4,23 @@ import { VisualizationSpec } from 'react-vega';
 import BaseChart, { formatTime } from 'parser/ui/BaseChart';
 import { AutoSizer } from 'react-virtualized';
 
-class ResourceGraph extends Analyzer {
-  /** Implementer must set this with dependencies! */
-  trackers: ResourceTracker[] = [];
+abstract class ResourceGraph extends Analyzer {
+  /** Implementer must override this to return the ResourceTracker for the resource to graph */
+  abstract tracker(): ResourceTracker;
 
   get plot() {
     const graphData: GraphData[] = [];
-    this.trackers.forEach((tracker) => {
-      tracker.resourceUpdates.forEach((u) => {
-        if (u.change !== 0) {
-          graphData.push({
-            timestamp: u.timestamp,
-            resource: tracker.resource.name,
-            amount: u.current - u.change,
-          });
-        }
+    const tracker = this.tracker();
+    tracker.resourceUpdates.forEach((u) => {
+      if (u.change !== 0) {
         graphData.push({
           timestamp: u.timestamp,
-          resource: tracker.resource.name,
-          amount: u.current,
+          amount: u.current - u.change,
         });
+      }
+      graphData.push({
+        timestamp: u.timestamp,
+        amount: u.current,
       });
     });
 
@@ -41,9 +38,6 @@ class ResourceGraph extends Analyzer {
         },
       ],
       encoding: {
-        color: {
-          field: 'resource',
-        },
         x: {
           field: 'timestamp_shifted',
           type: 'quantitative' as const,
@@ -103,8 +97,6 @@ class ResourceGraph extends Analyzer {
 type GraphData = {
   /** Timestamp of the data point */
   timestamp: number;
-  /** Name of the resource this data point is for */
-  resource: string;
   /** Amount of resource at the given time */
   amount: number;
   // TODO also include max, rate, etc??

@@ -33,15 +33,9 @@
     "src/analysis/retail/hunter/marksmanship",
     "src/analysis/retail/hunter/shared",
     "src/analysis/retail/hunter/survival",
-    "src/analysis/retail/mage/arcane",
-    "src/analysis/retail/mage/fire",
-    "src/analysis/retail/monk/mistweaver",
     "src/analysis/retail/monk/windwalker",
-    "src/analysis/retail/paladin/holy",
     "src/analysis/retail/paladin/protection",
     "src/analysis/retail/paladin/retribution",
-    "src/analysis/retail/paladin/shared",
-    "src/analysis/retail/priest/holy",
     "src/analysis/retail/priest/shadow",
     "src/analysis/retail/rogue/assassination",
     "src/analysis/retail/rogue/outlaw",
@@ -54,8 +48,7 @@
     "src/analysis/retail/warlock/demonology",
     "src/analysis/retail/warlock/destruction",
     "src/analysis/retail/warlock/shared",
-    "src/analysis/retail/warrior/arms",
-    "src/analysis/retail/warrior/protection"
+    "src/analysis/retail/warrior/arms"
   ],
   "ts-node": {
     // these options are overrides used only by ts-node
