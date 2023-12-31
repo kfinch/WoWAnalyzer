@@ -48,6 +48,7 @@ import FeralFrenzy from 'analysis/retail/druid/feral/modules/spells/FeralFrenzy'
 import Tier29 from 'analysis/retail/druid/feral/modules/dragonflight/Tier29';
 import DireFixation from 'analysis/retail/druid/feral/modules/spells/DireFixation';
 import SaberJaws from 'analysis/retail/druid/feral/modules/spells/SaberJaws';
+import OverflowingPowerLinkNormalizer from 'analysis/retail/druid/feral/normalizers/OverflowingPowerLinkNormalizer';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
@@ -58,6 +59,7 @@ class CombatLogParser extends CoreCombatLogParser {
     bloodtalonsLinkNormalizer: BloodtalonsLinkNormalizer,
     suddenAmbushLinkNormalizer: SuddenAmbushLinkNormalizer,
     rampantFerocityLinkNormalizer: RampantFerocityLinkNormalizer,
+    overflowingPowerLinkNormalizer: OverflowingPowerLinkNormalizer,
 
     // Core
     activeDruidForm: ActiveDruidForm,

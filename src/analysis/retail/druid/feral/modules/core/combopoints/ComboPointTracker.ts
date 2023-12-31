@@ -2,7 +2,7 @@ import { isConvoking } from 'analysis/retail/druid/shared/spells/ConvokeSpirits'
 import SPELLS from 'common/SPELLS';
 import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import { Options } from 'parser/core/Analyzer';
-import { ClassResources } from 'parser/core/Events';
+import { ClassResources, ResourceChangeEvent } from 'parser/core/Events';
 import ResourceTracker from 'parser/shared/modules/resources/resourcetracker/ResourceTracker';
 
 // Primal Fury may be slightly delayed.
@@ -30,6 +30,30 @@ class ComboPointTracker extends ResourceTracker {
     super(options);
     this.resource = RESOURCE_TYPES.COMBO_POINTS;
     this.maxResource = 5;
+  }
+
+  getAdjustedGain(event: ResourceChangeEvent): { gain: number; waste: number } {
+    if (event.ability.guid === SPELLS.OVERFLOWING_POWER_ENERGIZE.id) {
+      /*
+       * Overflowing Power is an effect gained during Berserk that allows Feral to 'store'
+       * up to 3 combo points over the cap. In practice, the builder shows as CPs wasted paired
+       * with a stack gain to Overflowing Power. Then when a finisher is used, OP 'cashs in'
+       * for combo point gain equal to the number of stacks. This presents a challenge for tracking
+       * CPs because we'll see builder waste that wasn't really waste because it added to the store.
+       *
+       * The most straightforward way to handle this would be to change wasted CPs that add to
+       * OP and call them gained, but this has two potential issues:
+       * 1) We are submitting resource change events at the wrong timestamp (on ability use instead of on 'cash in')
+       * 2) Those CPs might actually be waste after all, because when Berserk ends the stored CPs go away.
+       *
+       * We will account for both of those issues
+       */
+      return { gain: 0, waste: 0 };
+    }
+
+    const waste = event.waste;
+    const gain = event.resourceChange - waste;
+    return { gain, waste };
   }
 
   _applyBuilder(

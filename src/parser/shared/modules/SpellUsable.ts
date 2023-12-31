@@ -17,7 +17,7 @@ import Abilities from 'parser/core/modules/Abilities';
 import EventEmitter from 'parser/core/modules/EventEmitter';
 import { maybeGetTalentOrSpell } from 'common/maybeGetTalentOrSpell';
 
-const DEBUG = false;
+const DEBUG = true;
 
 /** Margin in milliseconds beyond which we log errors if numbers don't line up */
 export const COOLDOWN_LAG_MARGIN = 150;

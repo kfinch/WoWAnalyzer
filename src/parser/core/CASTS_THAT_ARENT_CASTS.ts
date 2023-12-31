@@ -70,6 +70,7 @@ const spells: number[] = [
 
   //region druid
   SPELLS.TRANQUILITY_HEAL.id,
+  SPELLS.OVERFLOWING_POWER_ENERGIZE.id,
   //endregion
 
   //region monk

@@ -991,11 +991,23 @@ const spells = {
     name: 'Berserk',
     icon: 'ability_druid_berserk',
   },
-  // this is the spell for the combo point refund (anything else?)
+  // this is the spell for the combo point refund (anything else?) TODO is this gone with the swap to Overflowing Power?
   BERSERK_ENERGIZE: {
     id: 343216,
     name: 'Berserk',
     icon: 'ability_druid_berserk',
+  },
+  // buff during Berserk that allows you to 'store' combo points. One stack per CP.
+  OVERFLOWING_POWER_BUFF: {
+    id: 405189,
+    name: 'Overflowing Power',
+    icon: 'inv_relics_idolofferocity',
+  },
+  // resource change when you 'cash in' Berserk stored combo points
+  OVERFLOWING_POWER_ENERGIZE: {
+    id: 405191,
+    name: 'Overflowing Power',
+    icon: 'inv_relics_idolofferocity',
   },
   PROWL: {
     id: 5215,
