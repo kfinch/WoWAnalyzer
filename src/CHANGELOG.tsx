@@ -38,6 +38,7 @@ import SpellLink from 'interface/SpellLink';
 
 // prettier-ignore
 export default [
+  change(date(2024, 10, 12), `Fixed an issue with the effective healing/damage patch causing the per-second damage and healing graphs to be incorrect and causing some by-ability healing and damage numbers to be too low`, Sref),
   change(date(2024, 10, 4), `Fixed many places where absorbed damage and healing was not counted as 'effective'`, Sref),
   change(date(2024, 10, 4), 'Added Earthen food buffs to consumable check.', emallson),
   change(date(2024, 10, 4), <>Added simple statistics for <ItemLink id={ITEMS.SPYMASTERS_WEB.id}/>.</>, Vetyst),
